@@ -1,7 +1,9 @@
+import { fetchLeads } from '../lib/fetchLeads'
+
 export default async function Home() {
   const leads = await fetchLeads()
 
-  console.log('LEADS:', leads) // 👈 Add this
+  console.log('LEADS:', leads) // 👈 log to function console
 
   return (
     <main style={{ padding: '2rem' }}>
