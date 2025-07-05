@@ -1,9 +1,11 @@
-import { fetchLeads } from '../lib/fetchLeads'
+export const dynamic = 'force-dynamic';
+
+import { fetchLeads } from '../lib/fetchLeads';
 
 export default async function Home() {
-  const leads = await fetchLeads()
+  const leads = await fetchLeads();
 
-  console.log('LEADS:', leads) // 👈 log to function console
+  console.log('LEADS:', leads); // ✅ now this will actually run server-side
 
   return (
     <main style={{ padding: '2rem' }}>
@@ -20,5 +22,5 @@ export default async function Home() {
         </ul>
       )}
     </main>
-  )
+  );
 }
