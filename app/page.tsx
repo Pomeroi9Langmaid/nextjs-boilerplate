@@ -1,6 +1,7 @@
-import { fetchLeads } from '../lib/fetchLeads'
 export default async function Home() {
-  const leads = await fetchLeads();
+  const leads = await fetchLeads()
+
+  console.log('LEADS:', leads) // 👈 Add this
 
   return (
     <main style={{ padding: '2rem' }}>
@@ -11,11 +12,11 @@ export default async function Home() {
         <ul>
           {leads.map((lead: any) => (
             <li key={lead.id}>
-              <strong>{lead.name}</strong> — {lead.email}
+              <strong>{lead.name}</strong> – {lead.email}
             </li>
           ))}
         </ul>
       )}
     </main>
-  );
+  )
 }
