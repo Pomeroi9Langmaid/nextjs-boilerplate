@@ -1,7 +1,8 @@
+// app/api/get-leads/route.ts
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-
-export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const { data, error } = await supabase.from('leads').select('*');
@@ -11,5 +12,11 @@ export async function GET() {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  // Transform current_stage to deal_stage for frontend use
+  const transformed = data.map((lead) => ({
+    ...lead,
+    deal_stage: lead.current_stage || 'Lead Only',
+  }));
+
+  return NextResponse.json(transformed);
 }
