@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from '@/components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '@/lib/fetchLeads';
+import DealStageDropdown from './components/DealStageDropdown'; // ✅ CORRECT RELATIVE PATH
+import { fetchLeadsFromAPI } from '../lib/fetchLeads'; // ✅ Adjust if needed based on actual location
 
 interface Lead {
   id: string;
