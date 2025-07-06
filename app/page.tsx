@@ -1,8 +1,9 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown'; // ✅ CORRECT RELATIVE PATH
-import { fetchLeadsFromAPI } from '../lib/fetchLeads'; // ✅ Adjust if needed based on actual location
+import DealStageDropdown from './components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
