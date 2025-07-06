@@ -8,7 +8,7 @@ interface Props {
   onStageChange: (leadId: string, newStage: string) => Promise<void>;
 }
 
-const STAGES = [
+const stageOptions = [
   'Lead Only',
   'Meeting Only',
   'Demo Complete (10%)',
@@ -31,19 +31,10 @@ export default function DealStageDropdown({ leadId, currentStage, onStageChange 
   };
 
   return (
-    <select
-      value={selected}
-      onChange={handleChange}
-      style={{
-        padding: '0.4rem',
-        borderRadius: '0.4rem',
-        border: '1px solid #ccc',
-        backgroundColor: '#fff',
-      }}
-    >
-      {STAGES.map((stage) => (
-        <option key={stage} value={stage}>
-          {stage}
+    <select value={selected} onChange={handleChange} style={{ padding: '0.4rem' }}>
+      {stageOptions.map((option) => (
+        <option key={option} value={option}>
+          {option}
         </option>
       ))}
     </select>

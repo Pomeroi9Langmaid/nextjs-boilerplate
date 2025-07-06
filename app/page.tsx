@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown'; // ✅ Corrected here
+import DealStageDropdown from '../components/DealStageDropdown';
 import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
