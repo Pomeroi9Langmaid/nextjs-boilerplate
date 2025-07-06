@@ -1,0 +1,24 @@
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { id, newStage } = body;
+
+    const { error } = await supabase
+      .from('leads')
+      .update({ deal_stage: newStage })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase update error:', error.message);
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Handler error:', err);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
