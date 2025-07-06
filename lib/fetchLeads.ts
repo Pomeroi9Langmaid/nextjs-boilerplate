@@ -1,15 +1,15 @@
-'use server'
-
-import { supabase } from '@/lib/supabaseClient'
-
-export const fetchLeads = async () => {
-  const { data, error } = await supabase.from('leads').select('*')
-
-  console.log('Fetched data:', data) // 👈 Add this
-  if (error) {
-    console.error('Error fetching leads:', error.message)
-    return []
+useEffect(() => {
+  async function fetchLeads() {
+    try {
+      const res = await fetch('/api/get-leads');
+      console.log('Fetch status:', res.status);
+      const data = await res.json();
+      console.log('Fetched leads:', data);
+      setLeads(data);
+    } catch (err) {
+      console.error('Failed to fetch leads:', err);
+    }
   }
 
-  return data
-}
+  fetchLeads();
+}, []);
