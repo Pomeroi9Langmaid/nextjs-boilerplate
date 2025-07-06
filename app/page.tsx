@@ -11,7 +11,7 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  current_stage?: string;
+  current_stage?: string; // ✅ CORRECT field from Supabase
   country?: string;
 }
 
@@ -78,7 +78,7 @@ export default function HomePage() {
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
-                currentStage={lead.current_stage || ''}
+                currentStage={lead.current_stage || ''} // ✅ Corrected here
                 onStageChange={handleStageChange}
               />
             </div>
