@@ -1,8 +1,9 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import DealStageDropdown from './components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
@@ -17,50 +18,40 @@ interface Lead {
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
-  const fetchLeadsFromAPI = async (): Promise<Lead[]> => {
-    console.log('🔍 Fetching leads from /api/get-leads...');
-    const response = await fetch('/api/get-leads');
-    const data = await response.json();
-    console.log('✅ API response:', data);
-    return data;
-  };
-
   useEffect(() => {
-    fetchLeadsFromAPI()
-      .then(setLeads)
-      .catch((err) => console.error('❌ Fetch error:', err));
+    refreshLeads();
   }, []);
 
-  const handleStageChange = useCallback(
-    async (leadId: string, newStage: string) => {
-      try {
-        console.log(`Updating lead ${leadId} to stage ${newStage}`);
+  const refreshLeads = async () => {
+    try {
+      const data = await fetchLeadsFromAPI();
+      setLeads(data);
+    } catch (err) {
+      console.error('Failed to fetch leads:', err);
+    }
+  };
 
-        // Optimistically update local state
+  const handleStageChange = async (leadId: string, newStage: string) => {
+    try {
+      const res = await fetch('/api/update-deal-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: leadId, newStage }),
+      });
+
+      if (res.ok) {
         setLeads((prevLeads) =>
           prevLeads.map((lead) =>
             lead.id === leadId ? { ...lead, current_stage: newStage } : lead
           )
         );
-
-        const res = await fetch('/api/update-deal-stage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: leadId, newStage }),
-        });
-
-        if (!res.ok) {
-          console.error('❌ Failed to update deal stage on backend');
-          // Optionally: rollback state here if you want
-        } else {
-          console.log(`✅ Updated ${leadId} to ${newStage} on backend`);
-        }
-      } catch (err) {
-        console.error('❌ Network error during stage update:', err);
+      } else {
+        console.error('Failed to update deal stage');
       }
-    },
-    []
-  );
+    } catch (err) {
+      console.error('Network error during update:', err);
+    }
+  };
 
   return (
     <main style={{ padding: '2rem' }}>
@@ -80,18 +71,11 @@ export default function HomePage() {
               backgroundColor: '#f9fafb',
             }}
           >
-            <div style={{ fontWeight: 'bold' }}>{lead.company || '—'}</div>
-            <div>👤 {lead.name || '—'}</div>
+            <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
+            <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginTop: '0.5rem',
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}

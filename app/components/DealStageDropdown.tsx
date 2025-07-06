@@ -37,9 +37,8 @@ const getColor = (stage: string) => {
 };
 
 const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChange }) => {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStage = event.target.value;
-    onStageChange(leadId, newStage);
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onStageChange(leadId, e.target.value);
   };
 
   return (
