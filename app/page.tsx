@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from '@/components/DealStageDropdown';
-
+import DealStageDropdown from './components/DealStageDropdown';
 interface Lead {
   id: string;
   company: string;
