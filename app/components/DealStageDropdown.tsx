@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import * as Select from '@radix-ui/react-select';
+import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
+import { useEffect, useState } from 'react';
 
 type DealStageDropdownProps = {
   id: string;
@@ -21,14 +23,13 @@ const stageOptions = [
 ];
 
 export default function DealStageDropdown({ id, currentStage }: DealStageDropdownProps) {
-  const [selected, setSelected] = useState<string>(currentStage);
+  const [selected, setSelected] = useState(currentStage);
 
   useEffect(() => {
-    setSelected(currentStage); // in case it arrives late
+    setSelected(currentStage);
   }, [currentStage]);
 
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = e.target.value;
+  const handleChange = async (newValue: string) => {
     setSelected(newValue);
 
     await fetch('/api/update-deal-stage', {
@@ -38,28 +39,63 @@ export default function DealStageDropdown({ id, currentStage }: DealStageDropdow
     });
   };
 
-  const activeOption = stageOptions.find(opt => opt.value === selected);
+  const selectedColour = stageOptions.find(opt => opt.value === selected)?.colour || '#eee';
 
   return (
     <div style={{ marginTop: '0.75rem' }}>
       <strong style={{ marginRight: '0.5rem' }}>Deal Stage:</strong>
-      <select
-        value={selected}
-        onChange={handleChange}
-        style={{
-          padding: '6px 10px',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          backgroundColor: activeOption?.colour || '#fff',
-          color: '#000',
-        }}
-      >
-        {stageOptions.map(option => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <Select.Root value={selected} onValueChange={handleChange}>
+        <Select.Trigger
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            backgroundColor: selectedColour,
+            color: '#000',
+            minWidth: 200,
+          }}
+        >
+          <Select.Value />
+          <Select.Icon>
+            <ChevronDownIcon />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Content
+            style={{
+              background: 'white',
+              border: '1px solid #ccc',
+              borderRadius: 6,
+              boxShadow: '0px 2px 10px rgba(0,0,0,0.1)',
+              zIndex: 9999,
+            }}
+          >
+            <Select.Viewport style={{ padding: 6 }}>
+              {stageOptions.map(option => (
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: 4,
+                    backgroundColor: option.value === selected ? option.colour : 'transparent',
+                    color: '#000',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Select.ItemText>{option.label}</Select.ItemText>
+                  <Select.ItemIndicator>
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.Viewport>
+          </Select.Content>
+        </Select.Portal>
+      </Select.Root>
     </div>
   );
 }
