@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  console.log('🔍 Supabase GET handler triggered');  // ✅ Debug logging
+  console.log('🔍 Supabase GET handler triggered');
 
   const { data, error } = await supabase.from('leads').select('*');
 

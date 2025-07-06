@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import styles from './DealStageDropdown.module.css';
 
-const standardDealStages = [
+const stageOptions = [
   'Lead Only',
   'Meeting Only',
   'Demo Complete (10%)',
@@ -15,76 +16,64 @@ const standardDealStages = [
   'CLOSED',
 ];
 
-const dealStageColours: Record<string, string> = {
-  'Lead Only': '#e2e8f0',
-  'Meeting Only': '#cbd5e1',
-  'Demo Complete (10%)': '#fef08a',
-  'Proposal Sent (25%)': '#fcd34d',
-  'Discussing Commercials (50%)': '#fdba74',
-  'Contract/Negotiation (90%)': '#fca5a5',
-  'ON HOLD': '#d1d5db',
-  'WON Deal': '#86efac',
-  'Lost Deal': '#94a3b8',
-  'CLOSED': '#e2e8f0',
+type Props = {
+  id: string;
+  currentStage: string;
 };
 
-interface DealStageDropdownProps {
-  leadId: string;
-  currentStage: string | null | undefined;
-  onStageChange: (leadId: string, newStage: string) => void;
-}
-
-export default function DealStageDropdown({
-  leadId,
-  currentStage,
-  onStageChange,
-}: DealStageDropdownProps) {
-  const [selected, setSelected] = useState(currentStage || '');
-  const [updating, setUpdating] = useState(false);
-
-  useEffect(() => {
-    setSelected(currentStage || '');
-  }, [currentStage]);
+export default function DealStageDropdown({ id, currentStage }: Props) {
+  const [selectedStage, setSelectedStage] = useState(currentStage);
+  const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStage = e.target.value;
-    setSelected(newStage);
-    setUpdating(true);
+    setSelectedStage(newStage);
+    setStatus('saving');
 
     try {
-      await onStageChange(leadId, newStage);
+      const res = await fetch('/api/update-deal-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, newStage }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update');
+
+      const result = await res.json();
+      if (result.success) {
+        setStatus('success');
+        setTimeout(() => setStatus('idle'), 2000); // Reset after 2s
+      } else {
+        throw new Error(result.error || 'Unknown error');
+      }
     } catch (err) {
-      console.error('Error updating deal stage:', err);
-    } finally {
-      setUpdating(false);
+      console.error('Update failed:', err);
+      setStatus('error');
     }
   };
 
-  // Merge current value with standard list, avoiding duplicates
-  const allStages = [...standardDealStages];
-  if (currentStage && !standardDealStages.includes(currentStage)) {
-    allStages.push(currentStage);
-  }
-
   return (
-    <select
-      value={selected}
-      onChange={handleChange}
-      style={{
-        backgroundColor: dealStageColours[selected] || '#f0f0f0',
-        border: '1px solid #ccc',
-        padding: '4px 8px',
-        borderRadius: '6px',
-        opacity: updating ? 0.6 : 1,
-        pointerEvents: updating ? 'none' : 'auto',
-      }}
-    >
-      <option value="">— Select Deal Stage —</option>
-      {allStages.map((stage) => (
-        <option key={stage} value={stage}>
-          {stage}
-        </option>
-      ))}
-    </select>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <select
+        value={selectedStage}
+        onChange={handleChange}
+        style={{
+          backgroundColor: selectedStage.includes('%') ? '#fff9c4' : selectedStage === 'WON Deal' ? '#c8e6c9' : selectedStage === 'Lost Deal' ? '#ffcdd2' : '#e0e0e0',
+          fontWeight: 500,
+          padding: '6px',
+          borderRadius: '6px',
+        }}
+      >
+        {stageOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+
+      {status === 'saving' && <span style={{ color: '#888', fontSize: '0.8rem' }}>⏳ Saving...</span>}
+      {status === 'success' && <span style={{ color: 'green', fontSize: '0.8rem' }}>✅ Updated!</span>}
+      {status === 'error' && <span style={{ color: 'red', fontSize: '0.8rem' }}>❌ Failed to update</span>}
+    </div>
   );
 }
