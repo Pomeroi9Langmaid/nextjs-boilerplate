@@ -1,101 +1,72 @@
-'use client';
+'use client'
 
-import * as Select from '@radix-ui/react-select';
-import { CheckIcon, ChevronDownIcon } from '@radix-ui/react-icons';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react'
 
-type DealStageDropdownProps = {
-  id: string;
-  currentStage: string;
-};
+type DealStage =
+  | 'Lead Only'
+  | 'Meeting Only'
+  | 'Demo Complete (10%)'
+  | 'Proposal Sent (25%)'
+  | 'Discussing Commercials (50%)'
+  | 'Contract/Negotiation (90%)'
+  | 'ON HOLD'
+  | 'WON Deal'
+  | 'Lost Deal'
+  | 'CLOSED'
 
-const stageOptions = [
-  { label: 'Lead Only', value: 'Lead Only', colour: '#999' },
-  { label: 'Meeting Only', value: 'Meeting Only', colour: '#999' },
-  { label: 'Demo Complete (10%)', value: 'Demo Complete (10%)', colour: '#999' },
-  { label: 'Proposal Sent (25%)', value: 'Proposal Sent (25%)', colour: '#6666cc' },
-  { label: 'Discussing Commercials (50%)', value: 'Discussing Commercials (50%)', colour: '#3399cc' },
-  { label: 'Contract/Negotiation (90%)', value: 'Contract/Negotiation (90%)', colour: '#33cc33' },
-  { label: 'ON HOLD', value: 'ON HOLD', colour: '#ffcc00' },
-  { label: 'WON Deal', value: 'WON Deal', colour: '#009933' },
-  { label: 'Lost Deal', value: 'Lost Deal', colour: '#cc0000' },
-  { label: 'CLOSED', value: 'CLOSED', colour: '#555' },
-];
+interface DealStageDropdownProps {
+  initialValue: DealStage
+  onChange: (value: DealStage) => void
+}
 
-export default function DealStageDropdown({ id, currentStage }: DealStageDropdownProps) {
-  const [selected, setSelected] = useState(currentStage);
+const dealStageColours: Record<DealStage, string> = {
+  'Lead Only': '#d3d3d3',
+  'Meeting Only': '#cce5ff',
+  'Demo Complete (10%)': '#b3f0ff',
+  'Proposal Sent (25%)': '#ffd699',
+  'Discussing Commercials (50%)': '#ffcccb',
+  'Contract/Negotiation (90%)': '#ff9999',
+  'ON HOLD': '#f5f5dc',
+  'WON Deal': '#90ee90',
+  'Lost Deal': '#f08080',
+  'CLOSED': '#e0e0e0',
+}
+
+const DealStageDropdown: React.FC<DealStageDropdownProps> = ({ initialValue, onChange }) => {
+  const [selectedStage, setSelectedStage] = useState<DealStage>(initialValue)
 
   useEffect(() => {
-    setSelected(currentStage);
-  }, [currentStage]);
+    setSelectedStage(initialValue)
+  }, [initialValue])
 
-  const handleChange = async (newValue: string) => {
-    setSelected(newValue);
-
-    await fetch('/api/update-deal-stage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, deal_stage: newValue }),
-    });
-  };
-
-  const selectedColour = stageOptions.find(opt => opt.value === selected)?.colour || '#eee';
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStage = e.target.value as DealStage
+    setSelectedStage(newStage)
+    onChange(newStage)
+  }
 
   return (
-    <div style={{ marginTop: '0.75rem' }}>
-      <strong style={{ marginRight: '0.5rem' }}>Deal Stage:</strong>
-      <Select.Root value={selected} onValueChange={handleChange}>
-        <Select.Trigger
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            backgroundColor: selectedColour,
-            color: '#000',
-            minWidth: 200,
-          }}
-        >
-          <Select.Value />
-          <Select.Icon>
-            <ChevronDownIcon />
-          </Select.Icon>
-        </Select.Trigger>
-        <Select.Portal>
-          <Select.Content
-            style={{
-              background: 'white',
-              border: '1px solid #ccc',
-              borderRadius: 6,
-              boxShadow: '0px 2px 10px rgba(0,0,0,0.1)',
-              zIndex: 9999,
-            }}
-          >
-            <Select.Viewport style={{ padding: 6 }}>
-              {stageOptions.map(option => (
-                <Select.Item
-                  key={option.value}
-                  value={option.value}
-                  style={{
-                    padding: '8px 10px',
-                    borderRadius: 4,
-                    backgroundColor: option.value === selected ? option.colour : 'transparent',
-                    color: '#000',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Select.ItemText>{option.label}</Select.ItemText>
-                  <Select.ItemIndicator>
-                    <CheckIcon />
-                  </Select.ItemIndicator>
-                </Select.Item>
-              ))}
-            </Select.Viewport>
-          </Select.Content>
-        </Select.Portal>
-      </Select.Root>
+    <div style={{ marginBottom: '8px' }}>
+      <label style={{ fontWeight: 'bold', marginRight: '8px' }}>Deal Stage:</label>
+      <select
+        value={selectedStage}
+        onChange={handleChange}
+        style={{
+          padding: '6px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          backgroundColor: dealStageColours[selectedStage],
+          fontWeight: 'bold',
+        }}
+      >
+        {Object.keys(dealStageColours).map(stage => (
+          <option key={stage} value={stage}>
+            {stage}
+          </option>
+        ))}
+      </select>
     </div>
-  );
+  )
 }
+
+export default DealStageDropdown
