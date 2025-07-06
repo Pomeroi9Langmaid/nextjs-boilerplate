@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { fetchLeads } from './fetchLeads';
-export default async function Home() {
+import { fetchLeads } from '../../lib/fetchLeads';
   const leads = await fetchLeads();
 
   console.log('LEADS:', leads); // ✅ now this will actually run server-side
