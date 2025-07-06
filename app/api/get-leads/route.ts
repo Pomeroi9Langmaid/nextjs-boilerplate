@@ -1,29 +1,15 @@
-// app/api/get-leads/route.ts
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
+
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
-
 export async function GET() {
-  const leads = [
-    {
-      id: '1',
-      company: 'Smartvel',
-      contact_name: 'John Smith',
-      job_title: 'Head of Travel Tech',
-      email: 'john@smartvel.com',
-      deal_stage: 'Meeting Only',
-      country: 'Spain',
-    },
-    {
-      id: '2',
-      company: 'TUI',
-      contact_name: 'Anna Muller',
-      job_title: 'Digital Director',
-      email: 'anna@tui.com',
-      deal_stage: 'Proposal Sent (25%)',
-      country: 'Germany',
-    },
-  ];
+  const { data, error } = await supabase.from('leads').select('*');
 
-  return NextResponse.json(leads);
+  if (error) {
+    console.error('Error fetching leads from Supabase:', error.message);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 }
