@@ -2,49 +2,48 @@
 
 import { useState } from 'react';
 
-type Props = {
+const DEAL_STAGES = [
+  { label: 'Lead Only', colour: '#808080' },
+  { label: 'Meeting Only', colour: '#007bff' },
+  { label: 'Demo Complete (10%)', colour: '#6f42c1' },
+  { label: 'Proposal Sent (25%)', colour: '#fd7e14' },
+  { label: 'Discussing Commercials (50%)', colour: '#e36d00' },
+  { label: 'Contract/Negotiation (90%)', colour: '#dc3545' },
+  { label: 'ON HOLD', colour: '#ffc107' },
+  { label: 'WON Deal', colour: '#28a745' },
+  { label: 'Lost Deal', colour: '#6c757d' },
+  { label: 'CLOSED', colour: '#d3d3d3' },
+];
+
+export default function DealStageDropdown({
+  id,
+  currentStage,
+}: {
   id: string;
   currentStage: string;
-};
-
-export default function DealStageDropdown({ id, currentStage }: Props) {
-  const [stage, setStage] = useState(currentStage || '');
+}) {
+  const [selected, setSelected] = useState(currentStage);
 
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStage = e.target.value;
-    setStage(newStage);
+    setSelected(newStage);
+
     await fetch('/api/update-deal-stage', {
       method: 'POST',
-      body: JSON.stringify({ id, newStage }),
+      body: JSON.stringify({ id, deal_stage: newStage }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   };
 
   return (
-    <div style={{ margin: '0.5rem 0' }}>
-      <label htmlFor={`stage-${id}`}>📊 Deal Stage:</label>
-      <select
-        id={`stage-${id}`}
-        value={stage}
-        onChange={handleChange}
-        style={{
-          marginLeft: '0.5rem',
-          padding: '0.3rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-        }}
-      >
-        <option value="">—</option>
-        <option value="Lead Only">Lead Only</option>
-        <option value="Meeting Only">Meeting Only</option>
-        <option value="Demo Complete (10%)">Demo Complete (10%)</option>
-        <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
-        <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
-        <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
-        <option value="ON HOLD">ON HOLD</option>
-        <option value="WON Deal">WON Deal</option>
-        <option value="Lost Deal">Lost Deal</option>
-        <option value="CLOSED">CLOSED</option>
-      </select>
-    </div>
+    <select value={selected} onChange={handleChange} style={{ padding: '6px', borderRadius: '6px' }}>
+      {DEAL_STAGES.map(({ label, colour }) => (
+        <option key={label} value={label} style={{ color: colour }}>
+          {label}
+        </option>
+      ))}
+    </select>
   );
 }
