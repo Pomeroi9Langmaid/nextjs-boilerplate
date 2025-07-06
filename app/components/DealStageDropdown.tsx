@@ -41,25 +41,21 @@ export default function DealStageDropdown({ leadId, currentStage }: DealStageDro
   }, [currentStage]);
 
   return (
-    <div style={{ margin: '8px 0' }}>
-      <label style={{ fontWeight: 'bold' }}>Deal Stage: </label>
-      <select
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-        style={{
-          backgroundColor: dealStageColours[selected] || '#f0f0f0',
-          border: '1px solid #ccc',
-          padding: '4px 8px',
-          marginLeft: '8px',
-          borderRadius: '6px',
-        }}
-      >
-        {dealStages.map((stage) => (
-          <option key={stage} value={stage}>
-            {stage}
-          </option>
-        ))}
-      </select>
-    </div>
+    <select
+      value={selected}
+      onChange={(e) => setSelected(e.target.value)}
+      style={{
+        backgroundColor: dealStageColours[selected] || '#f0f0f0',
+        border: '1px solid #ccc',
+        padding: '4px 8px',
+        borderRadius: '6px',
+      }}
+    >
+      {dealStages.map((stage) => (
+        <option key={stage} value={stage}>
+          {stage}
+        </option>
+      ))}
+    </select>
   );
 }
