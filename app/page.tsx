@@ -8,10 +8,10 @@ import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 interface Lead {
   id: string;
   company: string;
-  contact_name: string;
+  name: string; // ✅ Updated from contact_name
   job_title?: string;
   email?: string;
-  current_stage?: string; // ✅ CORRECT field from Supabase
+  current_stage?: string;
   country?: string;
 }
 
@@ -43,7 +43,7 @@ export default function HomePage() {
 
       if (res.ok) {
         console.log(`✅ Updated ${leadId} to ${newStage}`);
-        setRefreshFlag((prev) => !prev); // Toggle to trigger refresh
+        setRefreshFlag((prev) => !prev);
       } else {
         console.error('❌ Failed to update deal stage');
       }
@@ -71,14 +71,14 @@ export default function HomePage() {
             }}
           >
             <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
-            <div>👤 {lead.contact_name}</div>
+            <div>👤 {lead.name}</div> {/* ✅ Updated */}
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
-                currentStage={lead.current_stage || ''} // ✅ Corrected here
+                currentStage={lead.current_stage || ''}
                 onStageChange={handleStageChange}
               />
             </div>
