@@ -13,13 +13,16 @@ export default async function Home() {
       {leads.length === 0 ? (
         <p>No leads found.</p>
       ) : (
-        <ul>
-          {leads.map((lead: any) => (
-            <li key={lead.id}>
-              <strong>{lead.name}</strong> – {lead.email}
-            </li>
-          ))}
-        </ul>
+<ul style={{ listStyle: 'none', padding: 0 }}>
+  {leads.map((lead: any) => (
+    <li key={lead.id} style={{ marginBottom: '1.5rem', padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <div><strong>{lead.name}</strong> – {lead.email}</div>
+      <div>🏢 <strong>Company:</strong> {lead.company}</div>
+      <div>💼 <strong>Job Title:</strong> {lead.job_title}</div>
+      <div>📊 <strong>Deal Stage:</strong> {lead.deal_stage}</div>
+    </li>
+  ))}
+</ul>
       )}
     </main>
   );
