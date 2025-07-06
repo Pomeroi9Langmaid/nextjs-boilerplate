@@ -1,62 +1,53 @@
-'use client'
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from 'react'
+const dealStageColours: Record<string, string> = {
+  'Lead Only': '#e2e8f0', // grey-200
+  'Meeting Only': '#cbd5e0', // grey-300
+  'Demo Complete (10%)': '#fed7aa', // orange-200
+  'Proposal Sent (25%)': '#fbd38d', // yellow-300
+  'Discussing Commercials (50%)': '#faf089', // yellow-200
+  'Contract/Negotiation (90%)': '#9ae6b4', // green-200
+  'ON HOLD': '#fbb6ce', // pink-200
+  'WON Deal': '#90cdf4', // blue-300
+  'Lost Deal': '#feb2b2', // red-300
+  'CLOSED': '#d6bcfa' // purple-200
+};
 
-type DealStage =
-  | 'Lead Only'
-  | 'Meeting Only'
-  | 'Demo Complete (10%)'
-  | 'Proposal Sent (25%)'
-  | 'Discussing Commercials (50%)'
-  | 'Contract/Negotiation (90%)'
-  | 'ON HOLD'
-  | 'WON Deal'
-  | 'Lost Deal'
-  | 'CLOSED'
-
-interface DealStageDropdownProps {
-  initialValue: DealStage
-  onChange: (value: DealStage) => void
-}
-
-const dealStageColours: Record<DealStage, string> = {
-  'Lead Only': '#d3d3d3',
-  'Meeting Only': '#cce5ff',
-  'Demo Complete (10%)': '#b3f0ff',
-  'Proposal Sent (25%)': '#ffd699',
-  'Discussing Commercials (50%)': '#ffcccb',
-  'Contract/Negotiation (90%)': '#ff9999',
-  'ON HOLD': '#f5f5dc',
-  'WON Deal': '#90ee90',
-  'Lost Deal': '#f08080',
-  'CLOSED': '#e0e0e0',
-}
-
-const DealStageDropdown: React.FC<DealStageDropdownProps> = ({ initialValue, onChange }) => {
-  const [selectedStage, setSelectedStage] = useState<DealStage>(initialValue)
+export default function DealStageDropdown({ id, currentStage }: { id: string; currentStage: string }) {
+  const [selectedStage, setSelectedStage] = useState(currentStage);
 
   useEffect(() => {
-    setSelectedStage(initialValue)
-  }, [initialValue])
+    setSelectedStage(currentStage);
+  }, [currentStage]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStage = e.target.value as DealStage
-    setSelectedStage(newStage)
-    onChange(newStage)
-  }
+  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStage = e.target.value;
+    setSelectedStage(newStage);
+
+    try {
+      await fetch('/api/update-deal-stage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id, deal_stage: newStage })
+      });
+    } catch (err) {
+      console.error('Failed to update deal stage', err);
+    }
+  };
 
   return (
-    <div style={{ marginBottom: '8px' }}>
-      <label style={{ fontWeight: 'bold', marginRight: '8px' }}>Deal Stage:</label>
+    <div style={{ margin: '0.5rem 0' }}>
+      <strong>Deal Stage:</strong>{' '}
       <select
         value={selectedStage}
         onChange={handleChange}
         style={{
-          padding: '6px',
+          backgroundColor: dealStageColours[selectedStage] || '#f0f0f0',
+          padding: '0.25rem 0.5rem',
           borderRadius: '6px',
-          border: '1px solid #ccc',
-          backgroundColor: dealStageColours[selectedStage],
-          fontWeight: 'bold',
+          border: '1px solid #ccc'
         }}
       >
         {Object.keys(dealStageColours).map(stage => (
@@ -66,7 +57,5 @@ const DealStageDropdown: React.FC<DealStageDropdownProps> = ({ initialValue, onC
         ))}
       </select>
     </div>
-  )
+  );
 }
-
-export default DealStageDropdown
