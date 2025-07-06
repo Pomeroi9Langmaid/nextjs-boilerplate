@@ -4,7 +4,16 @@ export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
 import DealStageDropdown from './components/DealStageDropdown'; // ✅ Correct path
-import { Lead } from '@/types';
+
+interface Lead {
+  id: string;
+  company_name: string;
+  contact_name: string;
+  job_title?: string;
+  email?: string;
+  current_stage: string;
+  country?: string;
+}
 
 const fetchLeads = async (): Promise<Lead[]> => {
   console.log('🔍 Fetching leads from /api/get-leads...');
@@ -49,8 +58,8 @@ export default function HomePage() {
         >
           <h2 className="text-lg font-semibold">{lead.company_name}</h2>
           <p>👤 {lead.contact_name}</p>
-          <p>💼 {lead.job_title}</p>
-          <p>✉️ {lead.email}</p>
+          <p>💼 {lead.job_title || '—'}</p>
+          <p>✉️ {lead.email || '—'}</p>
           <div className="mt-2 mb-1 flex items-center gap-2">
             <span>📊 Deal Stage:</span>
             <DealStageDropdown
