@@ -35,6 +35,7 @@ interface DealStageDropdownProps {
 
 export default function DealStageDropdown({ leadId, currentStage }: DealStageDropdownProps) {
   const [selected, setSelected] = useState(currentStage || 'Lead Only');
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     setSelected(currentStage || 'Lead Only');
@@ -43,6 +44,7 @@ export default function DealStageDropdown({ leadId, currentStage }: DealStageDro
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStage = e.target.value;
     setSelected(newStage);
+    setUpdating(true);
 
     try {
       const res = await fetch('/api/update-deal-stage', {
@@ -52,12 +54,12 @@ export default function DealStageDropdown({ leadId, currentStage }: DealStageDro
       });
 
       if (!res.ok) {
-        console.error('❌ Update failed');
-      } else {
-        console.log(`✅ Stage updated to "${newStage}" for lead ${leadId}`);
+        console.error('Failed to update deal stage');
       }
     } catch (err) {
-      console.error('❌ Network error during update', err);
+      console.error('Error updating deal stage:', err);
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -70,6 +72,8 @@ export default function DealStageDropdown({ leadId, currentStage }: DealStageDro
         border: '1px solid #ccc',
         padding: '4px 8px',
         borderRadius: '6px',
+        opacity: updating ? 0.6 : 1,
+        pointerEvents: updating ? 'none' : 'auto',
       }}
     >
       {dealStages.map((stage) => (
