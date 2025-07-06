@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
+import DealStageDropdown from '@/components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '@/lib/fetchLeads';
+
 interface Lead {
   id: string;
   company: string;
@@ -16,17 +18,17 @@ export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
-    async function fetchLeads() {
+    async function loadLeads() {
       try {
-        const res = await fetch('/api/get-leads');
-        const data = await res.json();
+        const data = await fetchLeadsFromAPI();
+        console.log('Fetched leads:', data);
         setLeads(data);
       } catch (err) {
-        console.error('Failed to fetch leads:', err);
+        console.error('Fetch error:', err);
       }
     }
 
-    fetchLeads();
+    loadLeads();
   }, []);
 
   return (
