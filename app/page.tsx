@@ -9,7 +9,7 @@ export default async function Home() {
 
   return (
     <main style={{ padding: '2rem' }}>
-      <h1>My Leads</h1>
+    <h1>My Leads (v2 updated layout)</h1>
       {leads.length === 0 ? (
         <p>No leads found.</p>
       ) : (
