@@ -1,17 +1,32 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-import { fetchLeads } from '../lib/fetchLeads';
+import { useEffect, useState } from 'react';
 import DealStageDropdown from './components/DealStageDropdown';
-  const leads = await fetchLeads();
+
+export default function Page() {
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const res = await fetch('/api/get-leads'); // Make sure you have this API route
+      const data = await res.json();
+      setLeads(data || []);
+      setLoading(false);
+    };
+    fetchLeads();
+  }, []);
 
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ marginBottom: '2rem' }}>My Leads (Clean Layout)</h1>
-      {leads.length === 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : leads.length === 0 ? (
         <p>No leads found.</p>
       ) : (
         <div style={{ display: 'grid', gap: '1.5rem' }}>
-          {leads.map((lead: any) => (
+          {leads.map((lead) => (
             <div
               key={lead.id}
               style={{
