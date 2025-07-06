@@ -2,13 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
+import DealStageDropdown from '../components/DealStageDropdown';
 import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
   company: string;
-  name: string; // ✅ Updated from contact_name
+  name: string; // Supabase field for contact name
   job_title?: string;
   email?: string;
   current_stage?: string;
@@ -71,7 +71,7 @@ export default function HomePage() {
             }}
           >
             <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
-            <div>👤 {lead.name}</div> {/* ✅ Updated */}
+            <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
