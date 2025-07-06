@@ -11,7 +11,7 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  current_stage?: string; // ✅ this is the real field in Supabase
+  current_stage?: string;
   country?: string;
 }
 
@@ -22,7 +22,7 @@ export default function HomePage() {
   const refreshLeads = async () => {
     try {
       const data = await fetchLeadsFromAPI();
-      console.log('✅ Live Supabase leads:', data);
+      console.log('✅ Fetched leads:', data);
       setLeads(data);
     } catch (err) {
       console.error('❌ Fetch error:', err);
@@ -43,12 +43,12 @@ export default function HomePage() {
 
       if (res.ok) {
         console.log(`✅ Updated ${leadId} to ${newStage}`);
-        setRefreshFlag((prev) => !prev); // refresh after update
+        setRefreshFlag((prev) => !prev); // Toggle to trigger refresh
       } else {
-        console.error('❌ Update failed');
+        console.error('❌ Failed to update deal stage');
       }
     } catch (err) {
-      console.error('❌ Network error:', err);
+      console.error('❌ Network error during stage update:', err);
     }
   };
 
@@ -78,7 +78,7 @@ export default function HomePage() {
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
-                currentStage={lead.current_stage || ''} // ✅ use correct field
+                currentStage={lead.current_stage || ''}
                 onStageChange={handleStageChange}
               />
             </div>
