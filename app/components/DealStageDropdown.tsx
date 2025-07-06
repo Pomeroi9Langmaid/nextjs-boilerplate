@@ -46,20 +46,18 @@ export default function DealStageDropdown({ leadId, currentStage }: DealStageDro
 
     try {
       const res = await fetch('/api/update-deal-stage', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: leadId, newStage }),
       });
 
       if (!res.ok) {
-        console.error('❌ Failed to update deal stage');
+        console.error('❌ Update failed');
       } else {
-        console.log(`✅ Updated deal stage for ${leadId} to ${newStage}`);
+        console.log(`✅ Stage updated to "${newStage}" for lead ${leadId}`);
       }
     } catch (err) {
-      console.error('Error updating deal stage:', err);
+      console.error('❌ Network error during update', err);
     }
   };
 
