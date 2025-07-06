@@ -78,8 +78,7 @@ export default function HomePage() {
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
   leadId={lead.id}
-  currentStage={lead.current_stage || ''} // ✅ expect what Supabase gives
-  onStageChange={handleStageChange}
+  currentStage={lead.current_stage || ''}  onStageChange={handleStageChange}
 />
             </div>
             <div>🌍 Country: {lead.country || '—'}</div>

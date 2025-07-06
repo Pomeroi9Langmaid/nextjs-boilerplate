@@ -12,5 +12,5 @@ export async function GET() {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data); // ✅ no transformation
+  return NextResponse.json(data); // ✅ No renaming
 }
