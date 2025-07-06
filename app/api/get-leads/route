@@ -1,8 +1,9 @@
 // app/api/get-leads/route.ts
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // Dummy test data for now
   const leads = [
     {
       id: '1',
