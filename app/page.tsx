@@ -12,6 +12,7 @@ interface Lead {
   job_title?: string;
   email?: string;
   current_stage?: string;
+  deal_stage?: string; // ✅ added this line to match what your API returns
   country?: string;
 }
 
@@ -77,9 +78,10 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
-  leadId={lead.id}
-  currentStage={lead.current_stage || ''}  onStageChange={handleStageChange}
-/>
+                leadId={lead.id}
+                currentStage={lead.deal_stage || ''} // ✅ Use deal_stage instead of current_stage
+                onStageChange={handleStageChange}
+              />
             </div>
             <div>🌍 Country: {lead.country || '—'}</div>
           </div>
