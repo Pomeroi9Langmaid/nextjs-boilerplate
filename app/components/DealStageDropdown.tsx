@@ -1,56 +1,60 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 const dealStageColours: Record<string, string> = {
-  'Lead Only': '#e2e8f0', // grey-200
-  'Meeting Only': '#cbd5e0', // grey-300
-  'Demo Complete (10%)': '#fed7aa', // orange-200
-  'Proposal Sent (25%)': '#fbd38d', // yellow-300
-  'Discussing Commercials (50%)': '#faf089', // yellow-200
-  'Contract/Negotiation (90%)': '#9ae6b4', // green-200
-  'ON HOLD': '#fbb6ce', // pink-200
-  'WON Deal': '#90cdf4', // blue-300
-  'Lost Deal': '#feb2b2', // red-300
-  'CLOSED': '#d6bcfa' // purple-200
+  'Lead Only': '#e2e8f0',                // light grey
+  'Meeting Only': '#cbd5e1',             // slightly darker grey
+  'Demo Complete (10%)': '#fef08a',      // yellow
+  'Proposal Sent (25%)': '#fcd34d',      // orange
+  'Discussing Commercials (50%)': '#fdba74', // peach
+  'Contract/Negotiation (90%)': '#fca5a5',   // red
+  'ON HOLD': '#d1d5db',                  // neutral grey
+  'WON Deal': '#86efac',                 // green
+  'Lost Deal': '#94a3b8',                // cool grey
+  'CLOSED': '#e2e8f0',                   // light grey
 };
 
-export default function DealStageDropdown({ id, currentStage }: { id: string; currentStage: string }) {
-  const [selectedStage, setSelectedStage] = useState(currentStage);
+const dealStages = [
+  'Lead Only',
+  'Meeting Only',
+  'Demo Complete (10%)',
+  'Proposal Sent (25%)',
+  'Discussing Commercials (50%)',
+  'Contract/Negotiation (90%)',
+  'ON HOLD',
+  'WON Deal',
+  'Lost Deal',
+  'CLOSED',
+];
+
+interface DealStageDropdownProps {
+  leadId: number;
+  currentStage: string;
+}
+
+export default function DealStageDropdown({ leadId, currentStage }: DealStageDropdownProps) {
+  const [selected, setSelected] = useState(currentStage || 'Lead Only');
 
   useEffect(() => {
-    setSelectedStage(currentStage);
+    setSelected(currentStage || 'Lead Only');
   }, [currentStage]);
 
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStage = e.target.value;
-    setSelectedStage(newStage);
-
-    try {
-      await fetch('/api/update-deal-stage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id, deal_stage: newStage })
-      });
-    } catch (err) {
-      console.error('Failed to update deal stage', err);
-    }
-  };
-
   return (
-    <div style={{ margin: '0.5rem 0' }}>
-      <strong>Deal Stage:</strong>{' '}
+    <div style={{ margin: '8px 0' }}>
+      <label style={{ fontWeight: 'bold' }}>Deal Stage: </label>
       <select
-        value={selectedStage}
-        onChange={handleChange}
+        value={selected}
+        onChange={(e) => setSelected(e.target.value)}
         style={{
-          backgroundColor: dealStageColours[selectedStage] || '#f0f0f0',
-          padding: '0.25rem 0.5rem',
+          backgroundColor: dealStageColours[selected] || '#f0f0f0',
+          border: '1px solid #ccc',
+          padding: '4px 8px',
+          marginLeft: '8px',
           borderRadius: '6px',
-          border: '1px solid #ccc'
         }}
       >
-        {Object.keys(dealStageColours).map(stage => (
+        {dealStages.map((stage) => (
           <option key={stage} value={stage}>
             {stage}
           </option>
