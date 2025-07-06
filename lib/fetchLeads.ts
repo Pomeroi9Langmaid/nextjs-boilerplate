@@ -1,15 +1,12 @@
-useEffect(() => {
-  async function fetchLeads() {
-    try {
-      const res = await fetch('/api/get-leads');
-      console.log('Fetch status:', res.status);
-      const data = await res.json();
-      console.log('Fetched leads:', data);
-      setLeads(data);
-    } catch (err) {
-      console.error('Failed to fetch leads:', err);
-    }
+// lib/fetchLeads.ts
+
+export async function fetchLeadsFromAPI() {
+  const res = await fetch('/api/get-leads');
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch leads from API');
   }
 
-  fetchLeads();
-}, []);
+  const data = await res.json();
+  return data;
+}
