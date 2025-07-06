@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { fetchLeads } from '../lib/fetchLeads';
-import DealStageDropdown from '../components/DealStageDropdown';
-
+import DealStageDropdown from '@/components/DealStageDropdown';
 export default async function Page() {
   const leads = await fetchLeads();
 
