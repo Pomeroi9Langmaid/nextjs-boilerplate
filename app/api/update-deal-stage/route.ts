@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient'; // ✅ Use relative path if '@' doesn't resolve
+import { supabase } from '../../../lib/supabaseClient';
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       .from('leads')
       .update({ current_stage: newStage })
       .eq('id', id)
-      .select();  // Optional: return updated row
+      .select();
 
     if (error) {
       console.error('❌ Supabase update error:', error.message);
