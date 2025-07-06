@@ -1,14 +1,13 @@
 'use client';
-
-import { useState } from 'react';
+import React from 'react';
 
 interface Props {
   leadId: string;
   currentStage: string;
-  onStageChange: (leadId: string, newStage: string) => Promise<void>;
+  onStageChange: (leadId: string, newStage: string) => void;
 }
 
-const stageOptions = [
+const dealStageOptions = [
   'Lead Only',
   'Meeting Only',
   'Demo Complete (10%)',
@@ -21,22 +20,58 @@ const stageOptions = [
   'CLOSED',
 ];
 
-export default function DealStageDropdown({ leadId, currentStage, onStageChange }: Props) {
-  const [selected, setSelected] = useState(currentStage);
+const getColor = (stage: string) => {
+  switch (stage) {
+    case 'Lead Only':
+      return '#e5e7eb'; // light gray
+    case 'Meeting Only':
+      return '#fcd34d'; // yellow
+    case 'Demo Complete (10%)':
+      return '#93c5fd'; // blue
+    case 'Proposal Sent (25%)':
+      return '#60a5fa'; // darker blue
+    case 'Discussing Commercials (50%)':
+      return '#f97316'; // orange
+    case 'Contract/Negotiation (90%)':
+      return '#10b981'; // green
+    case 'WON Deal':
+      return '#22c55e'; // bright green
+    case 'Lost Deal':
+      return '#ef4444'; // red
+    case 'ON HOLD':
+      return '#a78bfa'; // purple
+    case 'CLOSED':
+      return '#6b7280'; // dark gray
+    default:
+      return '#d1d5db'; // fallback gray
+  }
+};
 
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStage = e.target.value;
-    setSelected(newStage);
-    await onStageChange(leadId, newStage);
+const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChange }) => {
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStage = event.target.value;
+    onStageChange(leadId, newStage);
   };
 
   return (
-    <select value={selected} onChange={handleChange} style={{ padding: '0.4rem' }}>
-      {stageOptions.map((option) => (
-        <option key={option} value={option}>
-          {option}
+    <select
+      value={currentStage}
+      onChange={handleChange}
+      style={{
+        backgroundColor: getColor(currentStage),
+        borderRadius: '0.25rem',
+        padding: '0.25rem 0.5rem',
+        border: '1px solid #d1d5db',
+        fontWeight: 'bold',
+      }}
+    >
+      {dealStageOptions.map((stage) => (
+        <option key={stage} value={stage}>
+          {stage}
         </option>
       ))}
     </select>
   );
-}
+};
+
+export default DealStageDropdown;

@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { id, newStage } = body;
+    const { id, newStage } = await req.json();
 
-    console.log('🛠️ Update Requested:', { id, newStage });
+    console.log('🛠️ Updating lead:', { id, newStage });
 
     const { data, error } = await supabase
       .from('leads')
@@ -19,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    console.log('✅ Updated row(s):', data);
+    console.log('✅ Successfully updated:', data);
     return NextResponse.json({ success: true, updated: data });
   } catch (err) {
     console.error('❌ Handler error:', err);
