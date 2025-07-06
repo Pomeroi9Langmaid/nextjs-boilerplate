@@ -2,13 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import DealStageDropdown from '../components/DealStageDropdown';
+import DealStageDropdown from '../components/DealStageDropdown'; // ✅ Fixed path
 import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
   company: string;
-  name: string; // Supabase field for contact name
+  name: string;
   job_title?: string;
   email?: string;
   current_stage?: string;
