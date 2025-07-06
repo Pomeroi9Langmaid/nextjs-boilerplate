@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from 'react';
 
+const standardDealStages = [
+  'Lead Only',
+  'Meeting Only',
+  'Demo Complete (10%)',
+  'Proposal Sent (25%)',
+  'Discussing Commercials (50%)',
+  'Contract/Negotiation (90%)',
+  'ON HOLD',
+  'WON Deal',
+  'Lost Deal',
+  'CLOSED',
+];
+
 const dealStageColours: Record<string, string> = {
   'Lead Only': '#e2e8f0',
   'Meeting Only': '#cbd5e1',
@@ -15,19 +28,6 @@ const dealStageColours: Record<string, string> = {
   'CLOSED': '#e2e8f0',
 };
 
-const dealStages = [
-  'Lead Only',
-  'Meeting Only',
-  'Demo Complete (10%)',
-  'Proposal Sent (25%)',
-  'Discussing Commercials (50%)',
-  'Contract/Negotiation (90%)',
-  'ON HOLD',
-  'WON Deal',
-  'Lost Deal',
-  'CLOSED',
-];
-
 interface DealStageDropdownProps {
   leadId: string;
   currentStage: string | null | undefined;
@@ -40,15 +40,10 @@ export default function DealStageDropdown({
   onStageChange,
 }: DealStageDropdownProps) {
   const [selected, setSelected] = useState(currentStage || '');
-
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    if (currentStage !== undefined && currentStage !== null) {
-      setSelected(currentStage);
-    } else {
-      setSelected('');
-    }
+    setSelected(currentStage || '');
   }, [currentStage]);
 
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -65,6 +60,12 @@ export default function DealStageDropdown({
     }
   };
 
+  // Merge current value with standard list, avoiding duplicates
+  const allStages = [...standardDealStages];
+  if (currentStage && !standardDealStages.includes(currentStage)) {
+    allStages.push(currentStage);
+  }
+
   return (
     <select
       value={selected}
@@ -79,7 +80,7 @@ export default function DealStageDropdown({
       }}
     >
       <option value="">— Select Deal Stage —</option>
-      {dealStages.map((stage) => (
+      {allStages.map((stage) => (
         <option key={stage} value={stage}>
           {stage}
         </option>
