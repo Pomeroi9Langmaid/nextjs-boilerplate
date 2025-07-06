@@ -31,7 +31,7 @@ const dealStages = [
 interface DealStageDropdownProps {
   leadId: string;
   currentStage: string;
-  onStageChange: (leadId: string, newStage: string) => void;
+  onStageChange: (leadId: string, newStage: string) => void; // ✅ add this line
 }
 
 export default function DealStageDropdown({
@@ -52,17 +52,7 @@ export default function DealStageDropdown({
     setUpdating(true);
 
     try {
-      const res = await fetch('/api/update-deal-stage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId, newStage }),
-      });
-
-      if (!res.ok) {
-        console.error('Failed to update deal stage');
-      } else {
-        onStageChange(leadId, newStage); // ✅ notify parent to trigger refresh
-      }
+      await onStageChange(leadId, newStage); // ✅ call parent callback
     } catch (err) {
       console.error('Error updating deal stage:', err);
     } finally {
