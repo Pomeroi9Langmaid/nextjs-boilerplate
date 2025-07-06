@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { fetchLeads } from '../lib/fetchLeads';
+import { fetchLeads } from '../../lib/fetchLeads';
 
 export default async function Home() {
   const leads = await fetchLeads();
