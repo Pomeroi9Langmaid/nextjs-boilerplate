@@ -30,8 +30,8 @@ const dealStages = [
 
 interface DealStageDropdownProps {
   leadId: string;
-  currentStage: string;
-  onStageChange: (leadId: string, newStage: string) => void; // ✅ add this line
+  currentStage: string | null | undefined;
+  onStageChange: (leadId: string, newStage: string) => void;
 }
 
 export default function DealStageDropdown({
@@ -39,11 +39,16 @@ export default function DealStageDropdown({
   currentStage,
   onStageChange,
 }: DealStageDropdownProps) {
-  const [selected, setSelected] = useState(currentStage || 'Lead Only');
+  const [selected, setSelected] = useState(currentStage || '');
+
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    setSelected(currentStage || 'Lead Only');
+    if (currentStage !== undefined && currentStage !== null) {
+      setSelected(currentStage);
+    } else {
+      setSelected('');
+    }
   }, [currentStage]);
 
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -52,7 +57,7 @@ export default function DealStageDropdown({
     setUpdating(true);
 
     try {
-      await onStageChange(leadId, newStage); // ✅ call parent callback
+      await onStageChange(leadId, newStage);
     } catch (err) {
       console.error('Error updating deal stage:', err);
     } finally {
@@ -73,6 +78,7 @@ export default function DealStageDropdown({
         pointerEvents: updating ? 'none' : 'auto',
       }}
     >
+      <option value="">— Select Deal Stage —</option>
       {dealStages.map((stage) => (
         <option key={stage} value={stage}>
           {stage}
