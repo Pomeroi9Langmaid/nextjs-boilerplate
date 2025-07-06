@@ -1,64 +1,66 @@
+// app/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import DealStageDropdown from '@/components/DealStageDropdown';
 
 interface Lead {
-  id: number;
+  id: string;
   company: string;
   contact_name: string;
-  job_title: string;
-  email: string;
-  country: string;
-  deal_stage: string;
+  job_title?: string;
+  email?: string;
+  deal_stage?: string;
+  country?: string;
 }
 
-export default function Page() {
+export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
-    const fetchLeads = async () => {
-      const res = await fetch('/api/get-leads');
-      const data = await res.json();
-      setLeads(data);
-    };
+    async function fetchLeads() {
+      try {
+        const res = await fetch('/api/get-leads');
+        const data = await res.json();
+        setLeads(data);
+      } catch (err) {
+        console.error('Failed to fetch leads:', err);
+      }
+    }
 
     fetchLeads();
   }, []);
 
   return (
-    <main style={{ padding: '1rem' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>My Leads (Clean Layout)</h1>
+    <main style={{ padding: '2rem' }}>
+      <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Lead Tracker</h1>
 
-      {leads.map((lead) => (
-        <div
-          key={lead.id}
-          style={{
-            border: '1px solid #ccc',
-            borderRadius: '12px',
-            padding: '1rem',
-            marginTop: '1.5rem',
-            boxShadow: '2px 2px 6px rgba(0,0,0,0.05)',
-          }}
-        >
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>🏢 {lead.company}</h2>
-          <div>👤 {lead.contact_name || 'No Contact'}</div>
-          <div>💼 {lead.job_title || 'No Title'}</div>
-          <div>✉️ {lead.email || 'No Email'}</div>
-
-          <DealStageDropdown
-            leadId={lead.id}
-            currentStage={lead.deal_stage || ''}
-          />
-
-          <div>🌍 <strong>Country:</strong> {lead.country || '—'}</div>
-
-          <div style={{ marginTop: '1rem' }}>
-            <button style={{ marginRight: '0.5rem' }}>Edit</button>
-            <button>View Log</button>
+      {leads.length === 0 ? (
+        <div>Loading leads...</div>
+      ) : (
+        leads.map((lead) => (
+          <div
+            key={lead.id}
+            style={{
+              border: '1px solid #e5e7eb',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              marginBottom: '1rem',
+              backgroundColor: '#f9fafb',
+            }}
+          >
+            <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
+            <div>👤 {lead.contact_name}</div>
+            <div>💼 {lead.job_title || 'No Title'}</div>
+            <div>✉️ {lead.email || 'No Email'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <span>📊 Deal Stage:</span>
+              <DealStageDropdown id={lead.id} currentStage={lead.deal_stage || ''} />
+            </div>
+            <div>🌍 Country: {lead.country || '—'}</div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </main>
   );
 }
