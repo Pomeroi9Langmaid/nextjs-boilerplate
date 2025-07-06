@@ -1,9 +1,7 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  experimental: {
-    serverActions: true,
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // You don't need serverActions manually enabled anymore
+  // Everything works with 'force-dynamic' in app/page.tsx
 };
 
 export default nextConfig;
