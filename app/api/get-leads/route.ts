@@ -12,11 +12,5 @@ export async function GET() {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 
-  // Transform current_stage to deal_stage for frontend use
-  const transformed = data.map((lead) => ({
-    ...lead,
-    deal_stage: lead.current_stage || 'Lead Only',
-  }));
-
-  return NextResponse.json(transformed);
+  return NextResponse.json(data); // ✅ no transformation
 }
