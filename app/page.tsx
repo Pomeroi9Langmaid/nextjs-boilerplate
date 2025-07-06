@@ -11,8 +11,7 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  current_stage?: string;
-  deal_stage?: string; // ✅ added this line to match what your API returns
+  current_stage?: string;  // ✅ this is what Supabase uses
   country?: string;
 }
 
@@ -44,7 +43,7 @@ export default function HomePage() {
 
       if (res.ok) {
         console.log(`✅ Updated ${leadId} to ${newStage}`);
-        setRefreshFlag((prev) => !prev); // Toggle to trigger refresh
+        setRefreshFlag((prev) => !prev); // Refresh data
       } else {
         console.error('❌ Failed to update deal stage');
       }
@@ -79,7 +78,7 @@ export default function HomePage() {
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
-                currentStage={lead.deal_stage || ''} // ✅ Use deal_stage instead of current_stage
+                currentStage={lead.current_stage || ''}  // ✅ use correct field name
                 onStageChange={handleStageChange}
               />
             </div>

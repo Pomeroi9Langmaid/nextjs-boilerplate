@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  console.log('🚀 LIVE Supabase fetch triggered...');  // ✅ This is the log line to add
+  console.log('🔍 Supabase GET handler triggered');  // ✅ Debug logging
 
   const { data, error } = await supabase.from('leads').select('*');
 
@@ -10,8 +12,6 @@ export async function GET() {
     console.error('❌ Supabase fetch error:', error.message);
     return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
   }
-
-  console.log('🔎 Supabase leads:', data);  // ✅ Optional: shows what Supabase actually returns
 
   return NextResponse.json(data);
 }
