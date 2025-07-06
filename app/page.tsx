@@ -56,8 +56,7 @@ export default function HomePage() {
             <div>✉️ {lead.email || 'No Email'}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
-              <DealStageDropdown leadId={lead.id} currentStage={lead.deal_stage || ''} />
-            </div>
+              <DealStageDropdown leadId={lead.id} currentStage={lead.current_stage || ''} />            </div>
             <div>🌍 Country: {lead.country || '—'}</div>
           </div>
         ))
