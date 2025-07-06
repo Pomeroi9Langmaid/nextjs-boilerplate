@@ -29,7 +29,7 @@ const dealStages = [
 ];
 
 interface DealStageDropdownProps {
-  leadId: number;
+  leadId: string;
   currentStage: string;
 }
 
