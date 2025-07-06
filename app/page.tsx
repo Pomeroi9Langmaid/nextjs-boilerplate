@@ -11,26 +11,46 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  current_stage?: string; // ✅ updated to match Supabase column
+  current_stage?: string;
   country?: string;
 }
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState(false);
+
+  const refreshLeads = async () => {
+    try {
+      const data = await fetchLeadsFromAPI();
+      console.log('✅ Fetched leads:', data);
+      setLeads(data);
+    } catch (err) {
+      console.error('❌ Fetch error:', err);
+    }
+  };
 
   useEffect(() => {
-    async function loadLeads() {
-      try {
-        const data = await fetchLeadsFromAPI();
-        console.log('Fetched leads:', data);
-        setLeads(data);
-      } catch (err) {
-        console.error('Fetch error:', err);
-      }
-    }
+    refreshLeads();
+  }, [refreshFlag]);
 
-    loadLeads();
-  }, []);
+  const handleStageChange = async (leadId: string, newStage: string) => {
+    try {
+      const res = await fetch('/api/update-deal-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: leadId, newStage }),
+      });
+
+      if (res.ok) {
+        console.log(`✅ Updated ${leadId} to ${newStage}`);
+        setRefreshFlag((prev) => !prev); // Toggle to trigger refresh
+      } else {
+        console.error('❌ Failed to update deal stage');
+      }
+    } catch (err) {
+      console.error('❌ Network error during stage update:', err);
+    }
+  };
 
   return (
     <main style={{ padding: '2rem' }}>
@@ -56,7 +76,12 @@ export default function HomePage() {
             <div>✉️ {lead.email || 'No Email'}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
-              <DealStageDropdown leadId={lead.id} currentStage={lead.current_stage || ''} />            </div>
+              <DealStageDropdown
+                leadId={lead.id}
+                currentStage={lead.current_stage || ''}
+                onStageChange={handleStageChange}
+              />
+            </div>
             <div>🌍 Country: {lead.country || '—'}</div>
           </div>
         ))
