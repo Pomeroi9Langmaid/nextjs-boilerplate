@@ -1,4 +1,3 @@
-// ✅ File: app/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +11,7 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  current_stage?: string; // ✅ correct field from Supabase
+  current_stage?: string; // ✅ this is the real field in Supabase
   country?: string;
 }
 
@@ -23,7 +22,7 @@ export default function HomePage() {
   const refreshLeads = async () => {
     try {
       const data = await fetchLeadsFromAPI();
-      console.log('✅ Fetched leads:', data);
+      console.log('✅ Live Supabase leads:', data);
       setLeads(data);
     } catch (err) {
       console.error('❌ Fetch error:', err);
@@ -44,12 +43,12 @@ export default function HomePage() {
 
       if (res.ok) {
         console.log(`✅ Updated ${leadId} to ${newStage}`);
-        setRefreshFlag((prev) => !prev);
+        setRefreshFlag((prev) => !prev); // refresh after update
       } else {
-        console.error('❌ Failed to update deal stage');
+        console.error('❌ Update failed');
       }
     } catch (err) {
-      console.error('❌ Network error during stage update:', err);
+      console.error('❌ Network error:', err);
     }
   };
 
@@ -79,7 +78,7 @@ export default function HomePage() {
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
-                currentStage={lead.current_stage || ''}
+                currentStage={lead.current_stage || ''} // ✅ use correct field
                 onStageChange={handleStageChange}
               />
             </div>
