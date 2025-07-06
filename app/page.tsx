@@ -11,7 +11,7 @@ interface Lead {
   contact_name: string;
   job_title?: string;
   email?: string;
-  deal_stage?: string;
+  current_stage?: string; // ✅ updated to match Supabase column
   country?: string;
 }
 
