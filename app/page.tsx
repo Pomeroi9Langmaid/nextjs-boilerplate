@@ -58,7 +58,6 @@ export default function HomePage() {
     setFilterStage(event.target.value);
   };
 
-  // Filter leads by selected deal stage if any filter applied
   const filteredLeads = filterStage
     ? leads.filter((lead) => (lead.current_stage || 'Lead Only') === filterStage)
     : leads;
@@ -68,9 +67,23 @@ export default function HomePage() {
       style={{
         padding: '2rem',
         fontFamily: 'Arial, Helvetica, sans-serif',
-        color: '#374151', // Dark grey text for normal text
+        color: '#374151',
       }}
     >
+      {/* Header */}
+      <h1
+        style={{
+          fontWeight: 'normal',
+          fontSize: '1.25rem',
+          marginBottom: '1rem',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          color: '#111827',
+        }}
+      >
+        Lead Tracker
+      </h1>
+
+      {/* Filter dropdown */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <select
           value={filterStage}
@@ -130,23 +143,14 @@ export default function HomePage() {
             >
               {lead.company}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-              👤 {lead.name}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
               💼 {lead.job_title || 'No Title'}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
               ✉️ {lead.email || 'No Email'}
             </div>
-            <div
-              style={{
-                fontSize: '0.85rem',
-                color: '#4b5563',
-                marginTop: '0.5rem',
-                fontFamily: 'Arial, Helvetica, sans-serif',
-              }}
-            >
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
               🌍 Country: {lead.country || '—'}
             </div>
             <div
@@ -157,9 +161,7 @@ export default function HomePage() {
                 marginTop: '0.25rem',
               }}
             >
-              <span style={{ fontSize: '0.85rem', color: '#4b5563', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                📊 Deal Stage:
-              </span>
+              <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
                 currentStage={lead.current_stage || 'Lead Only'}
