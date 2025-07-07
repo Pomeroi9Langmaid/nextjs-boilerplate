@@ -72,29 +72,39 @@ export default function LeadTrackerPage() {
     }
   };
 
-  // Filter leads based on filterStage selection
+  // Filter leads by selected stage
   const filteredLeads = filterStage
     ? leads.filter((lead) => lead.current_stage === filterStage)
     : leads;
 
   return (
     <>
-      {/* Filter dropdown positioned top right below nav */}
-      <div style={{ position: 'relative', padding: '1rem 2rem 2rem 2rem' }}>
-        <div style={{ position: 'absolute', top: '1rem', right: '2rem' }}>
+      {/* Filter container below nav with spacing */}
+      <div style={{ padding: '1rem 2rem 2rem 2rem', position: 'relative' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '2rem',
+            zIndex: 10,
+          }}
+        >
           <select
             value={filterStage}
             onChange={(e) => setFilterStage(e.target.value)}
             style={{
-              padding: '0.2rem 0.5rem',
-              fontSize: '0.8rem',
+              padding: '0.3rem 0.6rem',
+              fontSize: '0.85rem',
               borderRadius: '0.25rem',
               border: '1px solid #d1d5db',
               cursor: 'pointer',
               minWidth: '170px',
+              fontFamily: 'inherit', // Use inherited font for consistency
+              color: '#374151', // dark gray text color
+              backgroundColor: 'white',
             }}
           >
-            <option value=''>-- Filter by Deal Stage --</option>
+            <option value="">-- Filter by Deal Stage --</option>
             {dealStageOptions.map((stage) => (
               <option key={stage} value={stage}>
                 {stage}
@@ -103,58 +113,66 @@ export default function LeadTrackerPage() {
           </select>
         </div>
 
-        {/* Leads list */}
-        {filteredLeads.length === 0 ? (
-          <div>Loading leads...</div>
-        ) : (
-          filteredLeads.map((lead) => (
-            <div
-              key={lead.id}
-              style={{
-                border: '1px solid #e5e7eb',
-                padding: '1rem',
-                borderRadius: '0.5rem',
-                marginBottom: '1rem',
-                backgroundColor: '#f9fafb',
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  color: '#000000',
-                }}
-              >
-                {lead.company}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
-              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-                💼 {lead.job_title || 'No Title'}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-                ✉️ {lead.email || 'No Email'}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
-                🌍 Country: {lead.country || '—'}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  marginTop: '0.25rem',
-                }}
-              >
-                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
-                <DealStageDropdown
-                  leadId={lead.id}
-                  currentStage={lead.current_stage || 'Lead Only'}
-                  onStageChange={handleStageChange}
-                />
-              </div>
+        {/* Leads list - pushed down with padding top to avoid overlap */}
+        <div style={{ paddingTop: '3rem' }}>
+          {filteredLeads.length === 0 ? (
+            <div style={{ fontFamily: 'inherit', fontSize: '1rem', color: '#6b7280' }}>
+              Loading leads...
             </div>
-          ))
-        )}
+          ) : (
+            filteredLeads.map((lead) => (
+              <div
+                key={lead.id}
+                style={{
+                  border: '1px solid #e5e7eb',
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  marginBottom: '1rem',
+                  backgroundColor: '#f9fafb',
+                  fontFamily: 'inherit', // Restore default font style
+                  color: '#374151', // Dark gray text color for all except company name
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    color: '#111827', // near black for company name
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {lead.company}
+                </div>
+                <div style={{ fontSize: '0.85rem' }}>👤 {lead.name}</div>
+                <div style={{ fontSize: '0.85rem' }}>
+                  💼 {lead.job_title || 'No Title'}
+                </div>
+                <div style={{ fontSize: '0.85rem' }}>
+                  ✉️ {lead.email || 'No Email'}
+                </div>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                  🌍 Country: {lead.country || '—'}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    marginTop: '0.25rem',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  <span>📊 Deal Stage:</span>
+                  <DealStageDropdown
+                    leadId={lead.id}
+                    currentStage={lead.current_stage || 'Lead Only'}
+                    onStageChange={handleStageChange}
+                  />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </>
   );
