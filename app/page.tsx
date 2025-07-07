@@ -17,6 +17,7 @@ interface Lead {
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [loadingRollback, setLoadingRollback] = useState<string | null>(null); // lead id loading rollback
 
   useEffect(() => {
     refreshLeads();
@@ -53,6 +54,34 @@ export default function HomePage() {
     }
   };
 
+  const handleRollback = async (leadId: string, currentStage: string | undefined) => {
+    if (!currentStage) return;
+    setLoadingRollback(leadId);
+
+    try {
+      const res = await fetch('/api/get-previous-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId, currentStage }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        const previousStage = data.previousStage;
+        await handleStageChange(leadId, previousStage);
+      } else {
+        console.error('Rollback error:', data.error || 'Unknown error');
+        alert('Rollback failed: ' + (data.error || 'No previous stage found'));
+      }
+    } catch (err) {
+      console.error('Network error during rollback:', err);
+      alert('Rollback network error');
+    } finally {
+      setLoadingRollback(null);
+    }
+  };
+
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Lead Tracker</h1>
@@ -75,20 +104,20 @@ export default function HomePage() {
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginTop: '0.5rem',
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
                 currentStage={lead.current_stage || 'Lead Only'}
                 onStageChange={handleStageChange}
               />
+              <button
+                disabled={loadingRollback === lead.id}
+                onClick={() => handleRollback(lead.id, lead.current_stage)}
+                style={{ marginLeft: '1rem', cursor: 'pointer', padding: '0.25rem 0.5rem' }}
+              >
+                {loadingRollback === lead.id ? 'Rolling back...' : 'Rollback'}
+              </button>
             </div>
             <div>🌍 Country: {lead.country || '—'}</div>
           </div>
