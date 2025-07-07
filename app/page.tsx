@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';  // Adjust the path if needed
-import { fetchLeadsFromAPI } from '../lib/fetchLeads';           // Adjust the path if needed
+import DealStageDropdown from './components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
@@ -14,8 +14,28 @@ interface Lead {
   country?: string;
 }
 
+const dealStageOptions = [
+  'Lead Only',
+  'Meeting Only',
+  'Demo Complete (10%)',
+  'Proposal Sent (25%)',
+  'Discussing Commercials (50%)',
+  'Contract/Negotiation (90%)',
+  'ON HOLD',
+  'WON Deal',
+  'Lost Deal',
+  'CLOSED',
+  'Hot Lead (50%)',
+  'MEETING_SCHEDULED',
+  'No-show to Meeting',
+  'Termination Discussion',
+  'Many Discussions',
+  'New Demo (other departments)',
+];
+
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [filterStage, setFilterStage] = useState<string>('');
 
   useEffect(() => {
     refreshLeads();
@@ -52,12 +72,40 @@ export default function HomePage() {
     }
   };
 
+  // Filter leads by selected stage if filter applied
+  const filteredLeads = filterStage
+    ? leads.filter((lead) => lead.current_stage === filterStage)
+    : leads;
+
   return (
-    <main style={{ padding: '2rem' }}>
-      {leads.length === 0 ? (
+    <div style={{ position: 'relative', padding: '2rem' }}>
+      {/* Filter dropdown top right */}
+      <div style={{ position: 'absolute', top: 0, right: 0 }}>
+        <select
+          value={filterStage}
+          onChange={(e) => setFilterStage(e.target.value)}
+          style={{
+            padding: '0.25rem 0.5rem',
+            fontSize: '0.85rem',
+            borderRadius: '0.25rem',
+            border: '1px solid #d1d5db',
+            cursor: 'pointer',
+          }}
+        >
+          <option value=''>-- Filter by Deal Stage --</option>
+          {dealStageOptions.map((stage) => (
+            <option key={stage} value={stage}>
+              {stage}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Lead list */}
+      {filteredLeads.length === 0 ? (
         <div>Loading leads...</div>
       ) : (
-        leads.map((lead) => (
+        filteredLeads.map((lead) => (
           <div
             key={lead.id}
             style={{
@@ -99,6 +147,6 @@ export default function HomePage() {
           </div>
         ))
       )}
-    </main>
+    </div>
   );
 }
