@@ -1,7 +1,6 @@
 // app/layout.tsx
 import React from 'react';
 import Link from 'next/link';
-import './globals.css';
 
 export const metadata = {
   title: 'Andrew Leads',
@@ -20,7 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Settings
           </Link>
         </header>
-
         <main>{children}</main>
       </body>
     </html>
