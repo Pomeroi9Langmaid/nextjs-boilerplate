@@ -15,7 +15,6 @@ interface Lead {
   country?: string;
 }
 
-// Full list of deal stages including those from your CSV:
 const dealStageOptions = [
   'Lead Only',
   'Meeting Only',
@@ -37,7 +36,7 @@ const dealStageOptions = [
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filterStage, setFilterStage] = useState<string>(''); // '' means no filter
+  const [filterStage, setFilterStage] = useState<string>('');
 
   useEffect(() => {
     refreshLeads();
@@ -74,25 +73,25 @@ export default function HomePage() {
     }
   };
 
-  // Apply filtering here
   const filteredLeads = filterStage
     ? leads.filter((lead) => lead.current_stage === filterStage)
     : leads;
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+    <main style={{ padding: '2rem', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: '1rem', right: '2rem' }}>
         <select
           value={filterStage}
           onChange={(e) => setFilterStage(e.target.value)}
           style={{
-            padding: '0.3rem 0.6rem',
+            padding: '0.2rem 0.5rem',
             borderRadius: '0.25rem',
             border: '1px solid #d1d5db',
-            fontSize: '0.85rem',
+            fontSize: '0.75rem',
             fontWeight: 'normal',
-            minWidth: '180px',
+            minWidth: '160px',
             cursor: 'pointer',
+            backgroundColor: '#f9fafb',
           }}
         >
           <option value=''>-- Filter by Deal Stage --</option>
@@ -105,7 +104,7 @@ export default function HomePage() {
       </div>
 
       {filteredLeads.length === 0 ? (
-        <div>No leads found for selected stage.</div>
+        <div style={{ marginTop: '3rem' }}>No leads found for selected stage.</div>
       ) : (
         filteredLeads.map((lead) => (
           <div
@@ -116,13 +115,21 @@ export default function HomePage() {
               borderRadius: '0.5rem',
               marginBottom: '1rem',
               backgroundColor: '#f9fafb',
+              marginTop: '3rem', // To prevent overlap with filter dropdown
             }}
           >
             <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '0.5rem',
+              }}
+            >
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
