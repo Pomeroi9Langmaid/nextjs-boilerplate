@@ -1,26 +1,28 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabaseClient';
 
+const USERNAME = 'Andrew Langmaid'; // Update this as needed for multi-user setups
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { id, newStage, changedBy } = body; // changedBy is optional
+    const { id, newStage } = body;
 
-    // Fetch current lead to get old stage
-    const { data: leadData, error: fetchError } = await supabase
+    // 1. Fetch existing lead to get old stage
+    const { data: existingLead, error: fetchError } = await supabase
       .from('leads')
       .select('current_stage')
       .eq('id', id)
       .single();
 
     if (fetchError) {
-      console.error('Failed to fetch lead:', fetchError.message);
+      console.error('Error fetching existing lead:', fetchError.message);
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
     }
 
-    const oldStage = leadData.current_stage || '';
+    const oldStage = existingLead?.current_stage || null;
 
-    // Update the lead's current_stage
+    // 2. Update lead with new stage
     const { data: updateData, error: updateError } = await supabase
       .from('leads')
       .update({ current_stage: newStage })
@@ -28,23 +30,21 @@ export async function POST(req: Request) {
       .select();
 
     if (updateError) {
-      console.error('Failed to update lead stage:', updateError.message);
+      console.error('Error updating lead:', updateError.message);
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
 
-    // Insert audit log record
-    const { error: auditError } = await supabase
-      .from('audit_logs')
-      .insert({
-        lead_id: id,
-        old_stage: oldStage,
-        new_stage: newStage,
-        changed_by: changedBy || null,
-      });
+    // 3. Insert audit log record
+    const { error: logError } = await supabase.from('audit_log').insert({
+      lead_id: id,
+      old_stage: oldStage,
+      new_stage: newStage,
+      changed_by: USERNAME,
+    });
 
-    if (auditError) {
-      console.error('Failed to insert audit log:', auditError.message);
-      // Audit failure does not block main update, so continue
+    if (logError) {
+      console.error('Error inserting audit log:', logError.message);
+      // Do not fail update if logging fails, just warn
     }
 
     return NextResponse.json({ success: true, updated: updateData });
