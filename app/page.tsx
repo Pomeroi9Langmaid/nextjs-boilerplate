@@ -1,92 +1,21 @@
-'use client';
-export const dynamic = 'force-dynamic';
+import Link from 'next/link';
 
-import React, { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../lib/fetchLeads';
-
-interface Lead {
-  id: string;
-  company: string;
-  name: string;
-  job_title?: string;
-  email?: string;
-  current_stage?: string;
-  country?: string;
-}
+// Your existing imports and code...
 
 export default function HomePage() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-
-  useEffect(() => {
-    refreshLeads();
-  }, []);
-
-  const refreshLeads = async () => {
-    try {
-      const data = await fetchLeadsFromAPI();
-      setLeads(data);
-    } catch (err) {
-      console.error('Failed to fetch leads:', err);
-    }
-  };
-
-  const handleStageChange = async (leadId: string, newStage: string) => {
-    try {
-      const res = await fetch('/api/update-deal-stage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId, newStage }),
-      });
-
-      if (res.ok) {
-        setLeads((prevLeads) =>
-          prevLeads.map((lead) =>
-            lead.id === leadId ? { ...lead, current_stage: newStage } : lead
-          )
-        );
-      } else {
-        console.error('Failed to update deal stage');
-      }
-    } catch (err) {
-      console.error('Network error during update:', err);
-    }
-  };
+  // your existing code
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Lead Tracker</h1>
+    <>
+      <nav style={{ padding: '1rem', borderBottom: '1px solid #ddd' }}>
+        <Link href="/" style={{ marginRight: '1rem' }}>Lead Tracker</Link>
+        <Link href="/settings">Settings</Link>
+      </nav>
 
-      {leads.length === 0 ? (
-        <div>Loading leads...</div>
-      ) : (
-        leads.map((lead) => (
-          <div
-            key={lead.id}
-            style={{
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              backgroundColor: '#f9fafb',
-            }}
-          >
-            <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
-            <div>👤 {lead.name}</div>
-            <div>💼 {lead.job_title || 'No Title'}</div>
-            <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-              <span>📊 Deal Stage:</span>
-              <DealStageDropdown
-                leadId={lead.id}
-                currentStage={lead.current_stage || 'Lead Only'}
-                onStageChange={handleStageChange}
-              />
-            </div>
-            <div>🌍 Country: {lead.country || '—'}</div>
-          </div>
-        ))
-      )}
-    </main>
+      {/* Your existing Lead Tracker UI below */}
+      <main style={{ padding: '2rem' }}>
+        {/* existing UI */}
+      </main>
+    </>
   );
 }
