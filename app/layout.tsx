@@ -1,21 +1,18 @@
-// app/layout.tsx (or your Header component)
+import NavBar from './components/NavBar';
 
-import React from 'react';
-import Link from 'next/link';
+export const metadata = {
+  title: 'Lead Tracker',
+  description: 'Manage your leads effectively',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <nav style={{ fontSize: '0.9rem', fontWeight: 'normal', padding: '1rem', borderBottom: '1px solid #ddd' }}>
-          <Link href="/" style={{ marginRight: '1.5rem', fontWeight: 'normal', color: 'black', textDecoration: 'none' }}>
-            Lead Tracker
-          </Link>
-          <Link href="/settings" style={{ fontWeight: 'normal', color: 'black', textDecoration: 'none' }}>
-            Settings
-          </Link>
-        </nav>
-        {children}
+      <body style={{ margin: 0, fontFamily: 'Arial, Helvetica, sans-serif', backgroundColor: '#f9fafb' }}>
+        <NavBar />
+        <main style={{ padding: '2rem' }}>
+          {children}
+        </main>
       </body>
     </html>
   );
