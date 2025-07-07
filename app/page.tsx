@@ -4,16 +4,6 @@ import React, { useEffect, useState } from 'react';
 import DealStageDropdown from './components/DealStageDropdown';
 import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
-interface Lead {
-  id: string;
-  company: string;
-  name: string;
-  job_title?: string;
-  email?: string;
-  current_stage?: string;
-  country?: string;
-}
-
 const dealStageOptions = [
   'Lead Only',
   'Meeting Only',
@@ -33,9 +23,19 @@ const dealStageOptions = [
   'New Demo (other departments)',
 ];
 
-export default function HomePage() {
+interface Lead {
+  id: string;
+  company: string;
+  name: string;
+  job_title?: string;
+  email?: string;
+  current_stage?: string;
+  country?: string;
+}
+
+export default function LeadTrackerPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filterStage, setFilterStage] = useState<string>('');
+  const [filterStage, setFilterStage] = useState('');
 
   useEffect(() => {
     refreshLeads();
@@ -72,81 +72,90 @@ export default function HomePage() {
     }
   };
 
-  // Filter leads by selected stage if filter applied
+  // Filter leads based on filterStage selection
   const filteredLeads = filterStage
     ? leads.filter((lead) => lead.current_stage === filterStage)
     : leads;
 
   return (
-    <div style={{ position: 'relative', padding: '2rem' }}>
-      {/* Filter dropdown top right */}
-      <div style={{ position: 'absolute', top: 0, right: 0 }}>
-        <select
-          value={filterStage}
-          onChange={(e) => setFilterStage(e.target.value)}
-          style={{
-            padding: '0.25rem 0.5rem',
-            fontSize: '0.85rem',
-            borderRadius: '0.25rem',
-            border: '1px solid #d1d5db',
-            cursor: 'pointer',
-          }}
-        >
-          <option value=''>-- Filter by Deal Stage --</option>
-          {dealStageOptions.map((stage) => (
-            <option key={stage} value={stage}>
-              {stage}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Lead list */}
-      {filteredLeads.length === 0 ? (
-        <div>Loading leads...</div>
-      ) : (
-        filteredLeads.map((lead) => (
-          <div
-            key={lead.id}
+    <>
+      {/* Filter dropdown positioned top right below nav */}
+      <div style={{ position: 'relative', padding: '1rem 2rem 2rem 2rem' }}>
+        <div style={{ position: 'absolute', top: '1rem', right: '2rem' }}>
+          <select
+            value={filterStage}
+            onChange={(e) => setFilterStage(e.target.value)}
             style={{
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              backgroundColor: '#f9fafb',
+              padding: '0.2rem 0.5rem',
+              fontSize: '0.8rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              cursor: 'pointer',
+              minWidth: '170px',
             }}
           >
-            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>
-              {lead.company}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              💼 {lead.job_title || 'No Title'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              ✉️ {lead.email || 'No Email'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
-              🌍 Country: {lead.country || '—'}
-            </div>
+            <option value=''>-- Filter by Deal Stage --</option>
+            {dealStageOptions.map((stage) => (
+              <option key={stage} value={stage}>
+                {stage}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Leads list */}
+        {filteredLeads.length === 0 ? (
+          <div>Loading leads...</div>
+        ) : (
+          filteredLeads.map((lead) => (
             <div
+              key={lead.id}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginTop: '0.25rem',
+                border: '1px solid #e5e7eb',
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                marginBottom: '1rem',
+                backgroundColor: '#f9fafb',
               }}
             >
-              <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
-              <DealStageDropdown
-                leadId={lead.id}
-                currentStage={lead.current_stage || 'Lead Only'}
-                onStageChange={handleStageChange}
-              />
+              <div
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  color: '#000000',
+                }}
+              >
+                {lead.company}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
+              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
+                💼 {lead.job_title || 'No Title'}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
+                ✉️ {lead.email || 'No Email'}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
+                🌍 Country: {lead.country || '—'}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  marginTop: '0.25rem',
+                }}
+              >
+                <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
+                <DealStageDropdown
+                  leadId={lead.id}
+                  currentStage={lead.current_stage || 'Lead Only'}
+                  onStageChange={handleStageChange}
+                />
+              </div>
             </div>
-          </div>
-        ))
-      )}
-    </div>
+          ))
+        )}
+      </div>
+    </>
   );
 }
