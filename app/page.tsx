@@ -17,7 +17,7 @@ interface Lead {
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filterStage, setFilterStage] = useState<string>('');
+  const [filterStage, setFilterStage] = useState<string>(''); // For filter dropdown
 
   useEffect(() => {
     refreshLeads();
@@ -58,33 +58,27 @@ export default function HomePage() {
     setFilterStage(event.target.value);
   };
 
+  // Filter leads based on selected stage filter (if any)
   const filteredLeads = filterStage
-    ? leads.filter((lead) => (lead.current_stage || 'Lead Only') === filterStage)
+    ? leads.filter((lead) => lead.current_stage === filterStage)
     : leads;
 
   return (
-    <main
-      style={{
-        padding: '2rem',
-        fontFamily: 'Arial, Helvetica, sans-serif',
-        color: '#374151',
-      }}
-    >
-      {/* Header */}
-      <h1
+    <main style={{ padding: '2rem' }}>
+      {/* Header + filter container */}
+      <div
         style={{
-          fontWeight: 'normal',
-          fontSize: '1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: '1rem',
           fontFamily: 'Arial, Helvetica, sans-serif',
-          color: '#111827',
         }}
       >
-        Lead Tracker
-      </h1>
+        <h2 style={{ margin: 0, fontWeight: 'bold', fontSize: '1.25rem', color: '#000' }}>
+          Lead Tracker
+        </h2>
 
-      {/* Filter dropdown */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <select
           value={filterStage}
           onChange={handleFilterChange}
@@ -93,9 +87,8 @@ export default function HomePage() {
             padding: '0.25rem 0.5rem',
             borderRadius: '0.25rem',
             border: '1px solid #d1d5db',
-            color: '#374151',
             cursor: 'pointer',
-            minWidth: '160px',
+            minWidth: '180px',
           }}
         >
           <option value="">-- Filter by Deal Stage --</option>
@@ -109,17 +102,12 @@ export default function HomePage() {
           <option value="WON Deal">WON Deal</option>
           <option value="Lost Deal">Lost Deal</option>
           <option value="CLOSED">CLOSED</option>
-          <option value="Hot Lead (50%)">Hot Lead (50%)</option>
-          <option value="MEETING_SCHEDULED">MEETING_SCHEDULED</option>
-          <option value="No-show to Meeting">No-show to Meeting</option>
-          <option value="Termination Discussion">Termination Discussion</option>
-          <option value="Many Discussions">Many Discussions</option>
-          <option value="New Demo (other departments)">New Demo (other departments)</option>
+          {/* Add any other stages you want */}
         </select>
       </div>
 
       {filteredLeads.length === 0 ? (
-        <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>No leads found.</div>
+        <div>Loading leads...</div>
       ) : (
         filteredLeads.map((lead) => (
           <div
@@ -133,14 +121,7 @@ export default function HomePage() {
               fontFamily: 'Arial, Helvetica, sans-serif',
             }}
           >
-            <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                color: '#111827',
-                fontFamily: 'Arial, Helvetica, sans-serif',
-              }}
-            >
+            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>
               {lead.company}
             </div>
             <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
