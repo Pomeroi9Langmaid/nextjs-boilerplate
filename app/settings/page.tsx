@@ -2,8 +2,8 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
-import DealStageDropdown from '../components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../../lib/fetchLeads';
+import DealStageDropdown from './components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
   id: string;
@@ -15,7 +15,7 @@ interface Lead {
   country?: string;
 }
 
-export default function SettingsPage() {
+export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
@@ -55,7 +55,8 @@ export default function SettingsPage() {
 
   return (
     <main style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Settings</h1>
+      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Lead Tracker</h1>
+
       {leads.length === 0 ? (
         <div>Loading leads...</div>
       ) : (
@@ -74,15 +75,16 @@ export default function SettingsPage() {
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-              <span>📊 Deal Stage:</span>
-              <DealStageDropdown
-                leadId={lead.id}
-                currentStage={lead.current_stage || 'Lead Only'}
-                onStageChange={handleStageChange}
-              />
+            <div style={{ marginTop: '0.5rem' }}>
+              <div>🌍 Country: {lead.country || '—'}</div>
+              <div style={{ marginTop: '0.25rem' }}>
+                <DealStageDropdown
+                  leadId={lead.id}
+                  currentStage={lead.current_stage || 'Lead Only'}
+                  onStageChange={handleStageChange}
+                />
+              </div>
             </div>
-            <div>🌍 Country: {lead.country || '—'}</div>
           </div>
         ))
       )}
