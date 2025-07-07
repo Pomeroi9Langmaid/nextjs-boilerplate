@@ -75,7 +75,14 @@ export default function HomePage() {
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '0.5rem',
+              }}
+            >
               <span>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}

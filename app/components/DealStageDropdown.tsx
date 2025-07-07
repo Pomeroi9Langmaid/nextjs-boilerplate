@@ -50,6 +50,8 @@ const getColor = (stage: string) => {
 };
 
 const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChange }) => {
+  console.log('Rendering DealStageDropdown for', leadId, 'with currentStage:', currentStage);
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newStage = event.target.value;
     onStageChange(leadId, newStage);
@@ -57,7 +59,7 @@ const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChang
 
   return (
     <select
-      value={currentStage}
+      value={dealStageOptions.includes(currentStage) ? currentStage : ''}
       onChange={handleChange}
       style={{
         backgroundColor: getColor(currentStage),
@@ -67,6 +69,11 @@ const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChang
         fontWeight: 'bold',
       }}
     >
+      {!dealStageOptions.includes(currentStage) && (
+        <option value="" disabled>
+          {currentStage} (Unknown Stage)
+        </option>
+      )}
       {dealStageOptions.map((stage) => (
         <option key={stage} value={stage}>
           {stage}
