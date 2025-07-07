@@ -4,27 +4,29 @@ import React, { useState } from 'react';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleRollback = async () => {
-    if (!confirm('Are you sure you want to rollback the last deal stage change?')) return;
-
     setLoading(true);
-    setMessage('');
+    setMessage(null);
 
     try {
-      const res = await fetch('/api/rollback-deal-stage', {
+      const response = await fetch('/api/rollback-lead-stages', {
         method: 'POST',
       });
-      const data = await res.json();
 
-      if (res.ok && data.success) {
-        setMessage(`Rollback successful! Deal stage reverted to: ${data.rolledBackTo}`);
-      } else {
-        setMessage(`Rollback failed: ${data.error || 'Unknown error'}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
+
+      setMessage('Rollback completed successfully.');
     } catch (error) {
-      setMessage(`Rollback error: ${error.message}`);
+      if (error instanceof Error) {
+        setMessage(`Rollback error: ${error.message}`);
+      } else {
+        setMessage(`Rollback error: ${String(error)}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -37,19 +39,23 @@ export default function SettingsPage() {
         onClick={handleRollback}
         disabled={loading}
         style={{
-          backgroundColor: loading ? '#ccc' : '#dc2626',
+          padding: '0.5rem 1rem',
+          backgroundColor: '#ef4444',
           color: 'white',
-          padding: '0.75rem 1.5rem',
-          border: 'none',
-          borderRadius: '0.375rem',
-          cursor: loading ? 'not-allowed' : 'pointer',
           fontWeight: 'bold',
-          marginTop: '1rem',
+          borderRadius: '0.25rem',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          border: 'none',
         }}
       >
-        {loading ? 'Rolling Back...' : 'Rollback Last Deal Stage Change'}
+        {loading ? 'Rolling back...' : 'Rollback Lead Stages'}
       </button>
-      {message && <p style={{ marginTop: '1rem' }}>{message}</p>}
+
+      {message && (
+        <p style={{ marginTop: '1rem', color: message.startsWith('Rollback error') ? '#b91c1c' : '#15803d' }}>
+          {message}
+        </p>
+      )}
     </main>
   );
 }
