@@ -2,8 +2,8 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../lib/fetchLeads';
+import DealStageDropdown from '../components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../../lib/fetchLeads';
 
 interface Lead {
   id: string;
@@ -15,7 +15,7 @@ interface Lead {
   country?: string;
 }
 
-export default function HomePage() {
+export default function SettingsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function HomePage() {
 
   return (
     <main style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Lead Tracker</h1>
+      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Settings</h1>
 
       {leads.length === 0 ? (
         <div>Loading leads...</div>
