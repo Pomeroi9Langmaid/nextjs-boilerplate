@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
 import DealStageDropdown from './components/DealStageDropdown';
+import EngagementDropdown from './components/EngagementDropdown';
 import { fetchLeadsFromAPI } from '../lib/fetchLeads';
 
 interface Lead {
@@ -13,15 +14,11 @@ interface Lead {
   email?: string;
   current_stage?: string;
   country?: string;
-  lead_source?: string;
   engagement?: string;
 }
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filterStage, setFilterStage] = useState<string>('');
-  const [filterSource, setFilterSource] = useState<string>('');
-  const [filterEngagement, setFilterEngagement] = useState<string>('');
 
   useEffect(() => {
     refreshLeads();
@@ -58,103 +55,34 @@ export default function HomePage() {
     }
   };
 
-  const handleFilterStageChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterStage(e.target.value);
-  const handleFilterSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterSource(e.target.value);
-  const handleFilterEngagementChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterEngagement(e.target.value);
+  const handleEngagementChange = async (leadId: string, newEngagement: string) => {
+    try {
+      const res = await fetch('/api/update-engagement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: leadId, newEngagement }),
+      });
 
-  const filteredLeads = leads.filter((lead) => {
-    const stageMatch = filterStage ? lead.current_stage === filterStage : true;
-    const sourceMatch = filterSource ? lead.lead_source === filterSource : true;
-    const engagementMatch = filterEngagement ? lead.engagement === filterEngagement : true;
-    return stageMatch && sourceMatch && engagementMatch;
-  });
-
-  const uniqueSources = Array.from(new Set(leads.map(l => l.lead_source).filter(Boolean)));
-  const uniqueEngagements = Array.from(new Set(leads.map(l => l.engagement).filter(Boolean)));
+      if (res.ok) {
+        setLeads((prevLeads) =>
+          prevLeads.map((lead) =>
+            lead.id === leadId ? { ...lead, engagement: newEngagement } : lead
+          )
+        );
+      } else {
+        console.error('Failed to update engagement');
+      }
+    } catch (err) {
+      console.error('Network error during update:', err);
+    }
+  };
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-      {/* Filters container */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          gap: '1rem',
-          marginBottom: '1rem',
-          marginTop: '0.25rem',
-        }}
-      >
-        <select
-          value={filterStage}
-          onChange={handleFilterStageChange}
-          style={{
-            fontSize: '0.85rem',
-            padding: '0.25rem 0.5rem',
-            borderRadius: '0.25rem',
-            border: '1px solid #d1d5db',
-            cursor: 'pointer',
-            minWidth: '180px',
-          }}
-        >
-          <option value="">Deal Stage</option>
-          <option value="Lead Only">Lead Only</option>
-          <option value="Meeting Only">Meeting Only</option>
-          <option value="Demo Complete (10%)">Demo Complete (10%)</option>
-          <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
-          <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
-          <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
-          <option value="ON HOLD">ON HOLD</option>
-          <option value="WON Deal">WON Deal</option>
-          <option value="Lost Deal">Lost Deal</option>
-          <option value="CLOSED">CLOSED</option>
-        </select>
-
-        <select
-          value={filterSource}
-          onChange={handleFilterSourceChange}
-          style={{
-            fontSize: '0.85rem',
-            padding: '0.25rem 0.5rem',
-            borderRadius: '0.25rem',
-            border: '1px solid #d1d5db',
-            cursor: 'pointer',
-            minWidth: '160px',
-          }}
-        >
-          <option value="">Source</option>
-          {uniqueSources.map((source) => (
-            <option key={source} value={source}>
-              {source}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={filterEngagement}
-          onChange={handleFilterEngagementChange}
-          style={{
-            fontSize: '0.85rem',
-            padding: '0.25rem 0.5rem',
-            borderRadius: '0.25rem',
-            border: '1px solid #d1d5db',
-            cursor: 'pointer',
-            minWidth: '160px',
-          }}
-        >
-          <option value="">Engagement</option>
-          {uniqueEngagements.map((engagement) => (
-            <option key={engagement} value={engagement}>
-              {engagement}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Leads List */}
-      {filteredLeads.length === 0 ? (
+    <main style={{ padding: '2rem' }}>
+      {leads.length === 0 ? (
         <div>Loading leads...</div>
       ) : (
-        filteredLeads.map((lead) => (
+        leads.map((lead) => (
           <div
             key={lead.id}
             style={{
@@ -165,13 +93,41 @@ export default function HomePage() {
               backgroundColor: '#f9fafb',
             }}
           >
-            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>{lead.company}</div>
+            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>
+              {lead.company}
+            </div>
             <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>💼 {lead.job_title || 'No Title'}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>📂 Source: {lead.lead_source || '—'}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>🌍 Country: {lead.country || '—'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
+              💼 {lead.job_title || 'No Title'}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
+              ✉️ {lead.email || 'No Email'}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
+              🌍 Country: {lead.country || '—'}
+            </div>
+
+            {/* Engagement dropdown below company info */}
+            <div style={{ marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '0.85rem', color: '#4b5563', marginRight: '0.5rem' }}>
+                🔥 Engagement:
+              </span>
+              <EngagementDropdown
+                leadId={lead.id}
+                currentEngagement={lead.engagement || 'Low'}
+                onEngagementChange={handleEngagementChange}
+              />
+            </div>
+
+            {/* Deal Stage dropdown below engagement */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '0.25rem',
+              }}
+            >
               <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
@@ -179,7 +135,6 @@ export default function HomePage() {
                 onStageChange={handleStageChange}
               />
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>📈 Engagement: {lead.engagement || '—'}</div>
           </div>
         ))
       )}
