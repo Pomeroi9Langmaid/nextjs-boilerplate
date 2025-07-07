@@ -13,11 +13,13 @@ interface Lead {
   email?: string;
   current_stage?: string;
   country?: string;
+  lead_source?: string; // New source field
 }
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [filterStage, setFilterStage] = useState<string>(''); // For filter dropdown
+  const [filterStage, setFilterStage] = useState<string>('');
+  const [filterSource, setFilterSource] = useState<string>(''); // New source filter
 
   useEffect(() => {
     refreshLeads();
@@ -54,18 +56,27 @@ export default function HomePage() {
     }
   };
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFilterStageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterStage(event.target.value);
   };
 
-  // Filter leads based on selected stage filter (if any)
-  const filteredLeads = filterStage
-    ? leads.filter((lead) => lead.current_stage === filterStage)
-    : leads;
+  const handleFilterSourceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterSource(event.target.value);
+  };
+
+  // Filter leads by both stage and source (if selected)
+  const filteredLeads = leads.filter((lead) => {
+    const stageMatches = filterStage ? lead.current_stage === filterStage : true;
+    const sourceMatches = filterSource ? lead.lead_source === filterSource : true;
+    return stageMatches && sourceMatches;
+  });
+
+  // Extract unique lead sources for filter dropdown options
+  const uniqueSources = Array.from(new Set(leads.map((lead) => lead.lead_source).filter(Boolean)));
 
   return (
     <main style={{ padding: '2rem' }}>
-      {/* Header + filter container */}
+      {/* Header + filters container */}
       <div
         style={{
           display: 'flex',
@@ -79,31 +90,54 @@ export default function HomePage() {
           Lead Tracker
         </h2>
 
-        <select
-          value={filterStage}
-          onChange={handleFilterChange}
-          style={{
-            fontSize: '0.85rem',
-            padding: '0.25rem 0.5rem',
-            borderRadius: '0.25rem',
-            border: '1px solid #d1d5db',
-            cursor: 'pointer',
-            minWidth: '180px',
-          }}
-        >
-          <option value="">-- Filter by Deal Stage --</option>
-          <option value="Lead Only">Lead Only</option>
-          <option value="Meeting Only">Meeting Only</option>
-          <option value="Demo Complete (10%)">Demo Complete (10%)</option>
-          <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
-          <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
-          <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
-          <option value="ON HOLD">ON HOLD</option>
-          <option value="WON Deal">WON Deal</option>
-          <option value="Lost Deal">Lost Deal</option>
-          <option value="CLOSED">CLOSED</option>
-          {/* Add any other stages you want */}
-        </select>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          {/* Deal Stage Filter */}
+          <select
+            value={filterStage}
+            onChange={handleFilterStageChange}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              cursor: 'pointer',
+              minWidth: '180px',
+            }}
+          >
+            <option value="">-- Filter by Deal Stage --</option>
+            <option value="Lead Only">Lead Only</option>
+            <option value="Meeting Only">Meeting Only</option>
+            <option value="Demo Complete (10%)">Demo Complete (10%)</option>
+            <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
+            <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
+            <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
+            <option value="ON HOLD">ON HOLD</option>
+            <option value="WON Deal">WON Deal</option>
+            <option value="Lost Deal">Lost Deal</option>
+            <option value="CLOSED">CLOSED</option>
+          </select>
+
+          {/* Source Filter */}
+          <select
+            value={filterSource}
+            onChange={handleFilterSourceChange}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              cursor: 'pointer',
+              minWidth: '160px',
+            }}
+          >
+            <option value="">-- Filter by Source --</option>
+            {uniqueSources.map((source) => (
+              <option key={source} value={source}>
+                {source}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {filteredLeads.length === 0 ? (
@@ -132,6 +166,9 @@ export default function HomePage() {
               ✉️ {lead.email || 'No Email'}
             </div>
             <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
+              🏷 Source: {lead.lead_source || '—'}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>
               🌍 Country: {lead.country || '—'}
             </div>
             <div
