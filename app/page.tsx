@@ -14,14 +14,14 @@ interface Lead {
   current_stage?: string;
   country?: string;
   lead_source?: string;
-  engagement?: string;  // New engagement field
+  engagement?: string;
 }
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filterStage, setFilterStage] = useState<string>('');
   const [filterSource, setFilterSource] = useState<string>('');
-  const [filterEngagement, setFilterEngagement] = useState<string>(''); // New engagement filter
+  const [filterEngagement, setFilterEngagement] = useState<string>('');
 
   useEffect(() => {
     refreshLeads();
@@ -58,116 +58,99 @@ export default function HomePage() {
     }
   };
 
-  const handleFilterStageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterStage(event.target.value);
-  };
+  const handleFilterStageChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterStage(e.target.value);
+  const handleFilterSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterSource(e.target.value);
+  const handleFilterEngagementChange = (e: React.ChangeEvent<HTMLSelectElement>) => setFilterEngagement(e.target.value);
 
-  const handleFilterSourceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterSource(event.target.value);
-  };
-
-  const handleFilterEngagementChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterEngagement(event.target.value);
-  };
-
-  // Filter leads by stage, source, and engagement (if selected)
   const filteredLeads = leads.filter((lead) => {
-    const stageMatches = filterStage ? lead.current_stage === filterStage : true;
-    const sourceMatches = filterSource ? lead.lead_source === filterSource : true;
-    const engagementMatches = filterEngagement ? lead.engagement === filterEngagement : true;
-    return stageMatches && sourceMatches && engagementMatches;
+    const stageMatch = filterStage ? lead.current_stage === filterStage : true;
+    const sourceMatch = filterSource ? lead.lead_source === filterSource : true;
+    const engagementMatch = filterEngagement ? lead.engagement === filterEngagement : true;
+    return stageMatch && sourceMatch && engagementMatch;
   });
 
-  // Unique sources and engagements for dropdowns
-  const uniqueSources = Array.from(new Set(leads.map((lead) => lead.lead_source).filter(Boolean)));
-  const uniqueEngagements = Array.from(new Set(leads.map((lead) => lead.engagement).filter(Boolean)));
+  const uniqueSources = Array.from(new Set(leads.map(l => l.lead_source).filter(Boolean)));
+  const uniqueEngagements = Array.from(new Set(leads.map(l => l.engagement).filter(Boolean)));
 
   return (
-    <main style={{ padding: '2rem' }}>
+    <main style={{ padding: '2rem', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+      {/* Filters container */}
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: '1rem',
           marginBottom: '1rem',
-          fontFamily: 'Arial, Helvetica, sans-serif',
+          marginTop: '0.25rem',
         }}
       >
-        <h2 style={{ margin: 0, fontWeight: 'bold', fontSize: '1.25rem', color: '#000' }}>
-          Lead Tracker
-        </h2>
+        <select
+          value={filterStage}
+          onChange={handleFilterStageChange}
+          style={{
+            fontSize: '0.85rem',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.25rem',
+            border: '1px solid #d1d5db',
+            cursor: 'pointer',
+            minWidth: '180px',
+          }}
+        >
+          <option value="">Deal Stage</option>
+          <option value="Lead Only">Lead Only</option>
+          <option value="Meeting Only">Meeting Only</option>
+          <option value="Demo Complete (10%)">Demo Complete (10%)</option>
+          <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
+          <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
+          <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
+          <option value="ON HOLD">ON HOLD</option>
+          <option value="WON Deal">WON Deal</option>
+          <option value="Lost Deal">Lost Deal</option>
+          <option value="CLOSED">CLOSED</option>
+        </select>
 
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          {/* Deal Stage Filter */}
-          <select
-            value={filterStage}
-            onChange={handleFilterStageChange}
-            style={{
-              fontSize: '0.85rem',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              border: '1px solid #d1d5db',
-              cursor: 'pointer',
-              minWidth: '180px',
-            }}
-          >
-            <option value="">-- Filter by Deal Stage --</option>
-            <option value="Lead Only">Lead Only</option>
-            <option value="Meeting Only">Meeting Only</option>
-            <option value="Demo Complete (10%)">Demo Complete (10%)</option>
-            <option value="Proposal Sent (25%)">Proposal Sent (25%)</option>
-            <option value="Discussing Commercials (50%)">Discussing Commercials (50%)</option>
-            <option value="Contract/Negotiation (90%)">Contract/Negotiation (90%)</option>
-            <option value="ON HOLD">ON HOLD</option>
-            <option value="WON Deal">WON Deal</option>
-            <option value="Lost Deal">Lost Deal</option>
-            <option value="CLOSED">CLOSED</option>
-          </select>
+        <select
+          value={filterSource}
+          onChange={handleFilterSourceChange}
+          style={{
+            fontSize: '0.85rem',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.25rem',
+            border: '1px solid #d1d5db',
+            cursor: 'pointer',
+            minWidth: '160px',
+          }}
+        >
+          <option value="">Source</option>
+          {uniqueSources.map((source) => (
+            <option key={source} value={source}>
+              {source}
+            </option>
+          ))}
+        </select>
 
-          {/* Source Filter */}
-          <select
-            value={filterSource}
-            onChange={handleFilterSourceChange}
-            style={{
-              fontSize: '0.85rem',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              border: '1px solid #d1d5db',
-              cursor: 'pointer',
-              minWidth: '160px',
-            }}
-          >
-            <option value="">-- Filter by Source --</option>
-            {uniqueSources.map((source) => (
-              <option key={source} value={source}>
-                {source}
-              </option>
-            ))}
-          </select>
-
-          {/* Engagement Filter */}
-          <select
-            value={filterEngagement}
-            onChange={handleFilterEngagementChange}
-            style={{
-              fontSize: '0.85rem',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem',
-              border: '1px solid #d1d5db',
-              cursor: 'pointer',
-              minWidth: '160px',
-            }}
-          >
-            <option value="">-- Filter by Engagement --</option>
-            {uniqueEngagements.map((engagement) => (
-              <option key={engagement} value={engagement}>
-                {engagement}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={filterEngagement}
+          onChange={handleFilterEngagementChange}
+          style={{
+            fontSize: '0.85rem',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '0.25rem',
+            border: '1px solid #d1d5db',
+            cursor: 'pointer',
+            minWidth: '160px',
+          }}
+        >
+          <option value="">Engagement</option>
+          {uniqueEngagements.map((engagement) => (
+            <option key={engagement} value={engagement}>
+              {engagement}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Leads List */}
       {filteredLeads.length === 0 ? (
         <div>Loading leads...</div>
       ) : (
@@ -180,33 +163,15 @@ export default function HomePage() {
               borderRadius: '0.5rem',
               marginBottom: '1rem',
               backgroundColor: '#f9fafb',
-              fontFamily: 'Arial, Helvetica, sans-serif',
             }}
           >
-            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>
-              {lead.company}
-            </div>
+            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>{lead.company}</div>
             <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              💼 {lead.job_title || 'No Title'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              ✉️ {lead.email || 'No Email'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
-              🏷 Source: {lead.lead_source || '—'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>
-              🌍 Country: {lead.country || '—'}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginTop: '0.25rem',
-              }}
-            >
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>💼 {lead.job_title || 'No Title'}</div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>✉️ {lead.email || 'No Email'}</div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>📂 Source: {lead.lead_source || '—'}</div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>🌍 Country: {lead.country || '—'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
               <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
               <DealStageDropdown
                 leadId={lead.id}
@@ -214,9 +179,7 @@ export default function HomePage() {
                 onStageChange={handleStageChange}
               />
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>
-              📈 Engagement: {lead.engagement || '—'}
-            </div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>📈 Engagement: {lead.engagement || '—'}</div>
           </div>
         ))
       )}
