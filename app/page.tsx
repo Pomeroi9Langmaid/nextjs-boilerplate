@@ -56,34 +56,39 @@ export default function HomePage() {
 
   return (
     <>
-      <nav style={{ padding: '1rem', borderBottom: '1px solid #ddd' }}>
-        <Link href="/" style={{ marginRight: '1rem', fontWeight: 'bold' }}>Lead Tracker</Link>
-        <Link href="/settings">Settings</Link>
+      <nav style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #ddd', fontSize: '0.875rem', fontWeight: '500', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif',", color: '#555' }}>
+        <Link href="/" style={{ marginRight: '1.25rem', textDecoration: 'none', color: '#555' }}>Lead Tracker</Link>
+        <Link href="/settings" style={{ textDecoration: 'none', color: '#555' }}>Settings</Link>
       </nav>
 
-      <main style={{ padding: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Lead Tracker</h1>
+      <main style={{ padding: '1.5rem 2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: '600', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif'", color: '#222' }}>
+          Lead Tracker
+        </h1>
 
         {leads.length === 0 ? (
-          <div>Loading leads...</div>
+          <div style={{ color: '#666', fontSize: '0.9rem' }}>Loading leads...</div>
         ) : (
           leads.map((lead) => (
             <div
               key={lead.id}
               style={{
                 border: '1px solid #e5e7eb',
-                padding: '1rem',
+                padding: '0.85rem 1rem',
                 borderRadius: '0.5rem',
                 marginBottom: '1rem',
                 backgroundColor: '#f9fafb',
+                fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif'",
+                color: '#333',
+                fontSize: '0.95rem',
               }}
             >
-              <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
+              <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: '0.25rem' }}>{lead.company}</div>
               <div>👤 {lead.name}</div>
               <div>💼 {lead.job_title || 'No Title'}</div>
               <div>✉️ {lead.email || 'No Email'}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <span>📊 Deal Stage:</span>
+                <span style={{ fontWeight: '600' }}>📊 Deal Stage:</span>
                 <DealStageDropdown
                   leadId={lead.id}
                   currentStage={lead.current_stage || 'Lead Only'}
