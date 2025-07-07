@@ -2,8 +2,8 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../lib/fetchLeads';
+import DealStageDropdown from '../components/DealStageDropdown';
+import { fetchLeadsFromAPI } from '../../lib/fetchLeads';
 
 interface Lead {
   id: string;
@@ -15,8 +15,10 @@ interface Lead {
   country?: string;
 }
 
-export default function HomePage() {
+export default function SettingsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     refreshLeads();
@@ -53,11 +55,46 @@ export default function HomePage() {
     }
   };
 
+  const handleRollback = async () => {
+    setLoading(true);
+    setMessage('');
+    try {
+      const res = await fetch('/api/rollback-lead-stages', { method: 'POST' });
+      if (res.ok) {
+        setMessage('Rollback completed successfully.');
+        refreshLeads();
+      } else {
+        setMessage('Rollback failed.');
+      }
+    } catch (error) {
+      setMessage(`Rollback error: ${(error as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <main style={{ padding: '2rem', fontFamily: 'Arial, Helvetica, sans-serif', color: '#2e2e2e' }}>
-      <h1 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111' }}>
-        Lead Tracker
-      </h1>
+    <main style={{ padding: '2rem', fontSize: '0.85rem', color: '#333' }}>
+      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Settings</h1>
+
+      <button
+        onClick={handleRollback}
+        disabled={loading}
+        style={{
+          padding: '0.4rem 0.8rem',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0.375rem',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontSize: '0.85rem',
+          marginBottom: '1.5rem',
+        }}
+      >
+        {loading ? 'Rolling back...' : 'Rollback Lead Stages'}
+      </button>
+
+      {message && <p style={{ marginBottom: '1.5rem' }}>{message}</p>}
 
       {leads.length === 0 ? (
         <div>Loading leads...</div>
@@ -72,10 +109,10 @@ export default function HomePage() {
               marginBottom: '1rem',
               backgroundColor: '#f9fafb',
               fontSize: '0.85rem',
-              color: '#444444',
+              color: '#444',
             }}
           >
-            <div style={{ fontWeight: '700', fontSize: '1rem', color: '#222' }}>{lead.company}</div>
+            <div style={{ fontWeight: 'bold', color: '#171717' }}>{lead.company}</div>
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
