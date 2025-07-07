@@ -3,22 +3,32 @@ import React from 'react';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Andrew Leads',
-  description: 'Lead Tracker and Settings',
+  title: 'Lead Tracker',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: 'Arial, Helvetica, sans-serif', padding: '1rem', maxWidth: '900px', margin: '0 auto' }}>
-        <header style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #ddd', paddingBottom: '1rem' }}>
-          <Link href="/" style={{ textDecoration: 'none', fontWeight: 'bold', color: '#374151' }}>
+      <body style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        <nav
+          style={{
+            padding: '1rem 2rem',
+            borderBottom: '1px solid #ddd',
+            marginBottom: '2rem',
+            fontWeight: 'bold',
+            fontSize: '1rem',
+            display: 'flex',
+            gap: '2rem',
+            backgroundColor: '#f9fafb',
+          }}
+        >
+          <Link href="/" style={{ textDecoration: 'none', color: '#111' }}>
             Lead Tracker
           </Link>
-          <Link href="/settings" style={{ textDecoration: 'none', fontWeight: 'bold', color: '#374151' }}>
+          <Link href="/settings" style={{ textDecoration: 'none', color: '#111' }}>
             Settings
           </Link>
-        </header>
+        </nav>
         <main>{children}</main>
       </body>
     </html>
