@@ -13,13 +13,15 @@ interface Lead {
   email?: string;
   current_stage?: string;
   country?: string;
-  lead_source?: string; // New source field
+  lead_source?: string;
+  engagement?: string;  // New engagement field
 }
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filterStage, setFilterStage] = useState<string>('');
-  const [filterSource, setFilterSource] = useState<string>(''); // New source filter
+  const [filterSource, setFilterSource] = useState<string>('');
+  const [filterEngagement, setFilterEngagement] = useState<string>(''); // New engagement filter
 
   useEffect(() => {
     refreshLeads();
@@ -64,19 +66,24 @@ export default function HomePage() {
     setFilterSource(event.target.value);
   };
 
-  // Filter leads by both stage and source (if selected)
+  const handleFilterEngagementChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterEngagement(event.target.value);
+  };
+
+  // Filter leads by stage, source, and engagement (if selected)
   const filteredLeads = leads.filter((lead) => {
     const stageMatches = filterStage ? lead.current_stage === filterStage : true;
     const sourceMatches = filterSource ? lead.lead_source === filterSource : true;
-    return stageMatches && sourceMatches;
+    const engagementMatches = filterEngagement ? lead.engagement === filterEngagement : true;
+    return stageMatches && sourceMatches && engagementMatches;
   });
 
-  // Extract unique lead sources for filter dropdown options
+  // Unique sources and engagements for dropdowns
   const uniqueSources = Array.from(new Set(leads.map((lead) => lead.lead_source).filter(Boolean)));
+  const uniqueEngagements = Array.from(new Set(leads.map((lead) => lead.engagement).filter(Boolean)));
 
   return (
     <main style={{ padding: '2rem' }}>
-      {/* Header + filters container */}
       <div
         style={{
           display: 'flex',
@@ -137,6 +144,27 @@ export default function HomePage() {
               </option>
             ))}
           </select>
+
+          {/* Engagement Filter */}
+          <select
+            value={filterEngagement}
+            onChange={handleFilterEngagementChange}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              border: '1px solid #d1d5db',
+              cursor: 'pointer',
+              minWidth: '160px',
+            }}
+          >
+            <option value="">-- Filter by Engagement --</option>
+            {uniqueEngagements.map((engagement) => (
+              <option key={engagement} value={engagement}>
+                {engagement}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -185,6 +213,9 @@ export default function HomePage() {
                 currentStage={lead.current_stage || 'Lead Only'}
                 onStageChange={handleStageChange}
               />
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.25rem' }}>
+              📈 Engagement: {lead.engagement || '—'}
             </div>
           </div>
         ))
