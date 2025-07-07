@@ -56,13 +56,34 @@ export default function HomePage() {
 
   return (
     <>
-      <nav style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #ddd', fontSize: '0.875rem', fontWeight: '500', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif',", color: '#555' }}>
-        <Link href="/" style={{ marginRight: '1.25rem', textDecoration: 'none', color: '#555' }}>Lead Tracker</Link>
-        <Link href="/settings" style={{ textDecoration: 'none', color: '#555' }}>Settings</Link>
+      <nav
+        style={{
+          padding: '0.75rem 1rem',
+          borderBottom: '1px solid #ddd',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          color: '#555',
+        }}
+      >
+        <Link href="/" style={{ marginRight: '1.25rem', textDecoration: 'none', color: '#555' }}>
+          Lead Tracker
+        </Link>
+        <Link href="/settings" style={{ textDecoration: 'none', color: '#555' }}>
+          Settings
+        </Link>
       </nav>
 
       <main style={{ padding: '1.5rem 2rem' }}>
-        <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: '600', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif'", color: '#222' }}>
+        <h1
+          style={{
+            fontSize: '1rem', // Reduced from 1.25rem
+            marginBottom: '1rem',
+            fontWeight: '600',
+            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            color: '#222',
+          }}
+        >
           Lead Tracker
         </h1>
 
@@ -78,24 +99,34 @@ export default function HomePage() {
                 borderRadius: '0.5rem',
                 marginBottom: '1rem',
                 backgroundColor: '#f9fafb',
-                fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif'",
-                color: '#333',
-                fontSize: '0.95rem',
+                fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                color: '#444', // Dark grey for all except company
+                fontSize: '0.85rem', // Smaller font size for details
               }}
             >
-              <div style={{ fontWeight: '600', fontSize: '1rem', marginBottom: '0.25rem' }}>{lead.company}</div>
+              <div
+                style={{
+                  fontWeight: '600',
+                  fontSize: '1rem', // Company font size kept
+                  marginBottom: '0.25rem',
+                  color: '#222', // Stronger color for company name
+                }}
+              >
+                {lead.company}
+              </div>
               <div>👤 {lead.name}</div>
               <div>💼 {lead.job_title || 'No Title'}</div>
               <div>✉️ {lead.email || 'No Email'}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <span style={{ fontWeight: '600' }}>📊 Deal Stage:</span>
+              <div>🌍 Country: {lead.country || '—'}</div>
+
+              <div style={{ marginTop: '0.4rem' }}>
                 <DealStageDropdown
                   leadId={lead.id}
                   currentStage={lead.current_stage || 'Lead Only'}
                   onStageChange={handleStageChange}
+                  // Added style prop for smaller dropdown (optional)
                 />
               </div>
-              <div>🌍 Country: {lead.country || '—'}</div>
             </div>
           ))
         )}
