@@ -7,7 +7,6 @@ interface Props {
   onStageChange: (leadId: string, newStage: string) => void;
 }
 
-// Complete list of deal stages from your CSV
 const dealStageOptions = [
   'Lead Only',
   'Meeting Only',
@@ -29,29 +28,27 @@ const dealStageOptions = [
 
 const getColor = (stage: string) => {
   switch (stage) {
-    case 'Lead Only': return '#e5e7eb'; // light gray
-    case 'Meeting Only': return '#fcd34d'; // yellow
-    case 'Demo Complete (10%)': return '#93c5fd'; // blue
-    case 'Proposal Sent (25%)': return '#60a5fa'; // darker blue
-    case 'Discussing Commercials (50%)': return '#f97316'; // orange
-    case 'Contract/Negotiation (90%)': return '#10b981'; // green
-    case 'WON Deal': return '#22c55e'; // bright green
-    case 'Lost Deal': return '#ef4444'; // red
-    case 'ON HOLD': return '#a78bfa'; // purple
-    case 'CLOSED': return '#6b7280'; // dark gray
-    case 'Hot Lead (50%)': return '#a855f7'; // violet
-    case 'MEETING_SCHEDULED': return '#fbbf24'; // amber
-    case 'No-show to Meeting': return '#9ca3af'; // cool gray
-    case 'Termination Discussion': return '#f87171'; // soft red
-    case 'Many Discussions': return '#f59e0b'; // amber dark
-    case 'New Demo (other departments)': return '#60a5fa'; // light blue
-    default: return '#d1d5db'; // fallback gray
+    case 'Lead Only': return '#e5e7eb';
+    case 'Meeting Only': return '#fcd34d';
+    case 'Demo Complete (10%)': return '#93c5fd';
+    case 'Proposal Sent (25%)': return '#60a5fa';
+    case 'Discussing Commercials (50%)': return '#f97316';
+    case 'Contract/Negotiation (90%)': return '#10b981';
+    case 'WON Deal': return '#22c55e';
+    case 'Lost Deal': return '#ef4444';
+    case 'ON HOLD': return '#a78bfa';
+    case 'CLOSED': return '#6b7280';
+    case 'Hot Lead (50%)': return '#a855f7';
+    case 'MEETING_SCHEDULED': return '#fbbf24';
+    case 'No-show to Meeting': return '#9ca3af';
+    case 'Termination Discussion': return '#f87171';
+    case 'Many Discussions': return '#f59e0b';
+    case 'New Demo (other departments)': return '#60a5fa';
+    default: return '#d1d5db';
   }
 };
 
 const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChange }) => {
-  console.log('Rendering DealStageDropdown for', leadId, 'with currentStage:', currentStage);
-
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newStage = event.target.value;
     onStageChange(leadId, newStage);
@@ -59,21 +56,19 @@ const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChang
 
   return (
     <select
-      value={dealStageOptions.includes(currentStage) ? currentStage : ''}
+      value={currentStage}
       onChange={handleChange}
       style={{
         backgroundColor: getColor(currentStage),
         borderRadius: '0.25rem',
-        padding: '0.25rem 0.5rem',
+        padding: '0.15rem 0.4rem',
         border: '1px solid #d1d5db',
-        fontWeight: 'bold',
+        fontWeight: 'normal',       // Removed bold
+        fontSize: '0.85rem',        // Match other lead info font size
+        minWidth: '140px',
+        cursor: 'pointer',
       }}
     >
-      {!dealStageOptions.includes(currentStage) && (
-        <option value="" disabled>
-          {currentStage} (Unknown Stage)
-        </option>
-      )}
       {dealStageOptions.map((stage) => (
         <option key={stage} value={stage}>
           {stage}
