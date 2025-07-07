@@ -15,8 +15,29 @@ interface Lead {
   country?: string;
 }
 
+// Full list of deal stages including those from your CSV:
+const dealStageOptions = [
+  'Lead Only',
+  'Meeting Only',
+  'Demo Complete (10%)',
+  'Proposal Sent (25%)',
+  'Discussing Commercials (50%)',
+  'Contract/Negotiation (90%)',
+  'ON HOLD',
+  'WON Deal',
+  'Lost Deal',
+  'CLOSED',
+  'Hot Lead (50%)',
+  'MEETING_SCHEDULED',
+  'No-show to Meeting',
+  'Termination Discussion',
+  'Many Discussions',
+  'New Demo (other departments)',
+];
+
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [filterStage, setFilterStage] = useState<string>(''); // '' means no filter
 
   useEffect(() => {
     refreshLeads();
@@ -24,15 +45,14 @@ export default function HomePage() {
 
   const refreshLeads = async () => {
     try {
-      const data: Lead[] = await fetchLeadsFromAPI();
+      const data = await fetchLeadsFromAPI();
       setLeads(data);
     } catch (err) {
       console.error('Failed to fetch leads:', err);
     }
   };
 
-  // Add explicit types here for parameters:
-  const handleStageChange = async (leadId: string, newStage: string): Promise<void> => {
+  const handleStageChange = async (leadId: string, newStage: string) => {
     try {
       const res = await fetch('/api/update-deal-stage', {
         method: 'POST',
@@ -54,14 +74,40 @@ export default function HomePage() {
     }
   };
 
+  // Apply filtering here
+  const filteredLeads = filterStage
+    ? leads.filter((lead) => lead.current_stage === filterStage)
+    : leads;
+
   return (
     <main style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Lead Tracker</h1>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        <select
+          value={filterStage}
+          onChange={(e) => setFilterStage(e.target.value)}
+          style={{
+            padding: '0.3rem 0.6rem',
+            borderRadius: '0.25rem',
+            border: '1px solid #d1d5db',
+            fontSize: '0.85rem',
+            fontWeight: 'normal',
+            minWidth: '180px',
+            cursor: 'pointer',
+          }}
+        >
+          <option value=''>-- Filter by Deal Stage --</option>
+          {dealStageOptions.map((stage) => (
+            <option key={stage} value={stage}>
+              {stage}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {leads.length === 0 ? (
-        <div>Loading leads...</div>
+      {filteredLeads.length === 0 ? (
+        <div>No leads found for selected stage.</div>
       ) : (
-        leads.map((lead: Lead) => (
+        filteredLeads.map((lead) => (
           <div
             key={lead.id}
             style={{
@@ -76,16 +122,15 @@ export default function HomePage() {
             <div>👤 {lead.name}</div>
             <div>💼 {lead.job_title || 'No Title'}</div>
             <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ marginTop: '0.5rem' }}>
-              <div>🌍 Country: {lead.country || '—'}</div>
-              <div style={{ marginTop: '0.25rem' }}>
-                <DealStageDropdown
-                  leadId={lead.id}
-                  currentStage={lead.current_stage || 'Lead Only'}
-                  onStageChange={handleStageChange}
-                />
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <span>📊 Deal Stage:</span>
+              <DealStageDropdown
+                leadId={lead.id}
+                currentStage={lead.current_stage || 'Lead Only'}
+                onStageChange={handleStageChange}
+              />
             </div>
+            <div>🌍 Country: {lead.country || '—'}</div>
           </div>
         ))
       )}
