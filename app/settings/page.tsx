@@ -1,93 +1,48 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import React, { useEffect, useState } from 'react';
-import DealStageDropdown from '../components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../../lib/fetchLeads';
-
-interface Lead {
-  id: string;
-  company: string;
-  name: string;
-  job_title?: string;
-  email?: string;
-  current_stage?: string;
-  country?: string;
-}
+import React, { useState } from 'react';
 
 export default function SettingsPage() {
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    refreshLeads();
-  }, []);
-
-  const refreshLeads = async () => {
+  const handleRollback = async () => {
+    setLoading(true);
+    setMessage('');
     try {
-      const data = await fetchLeadsFromAPI();
-      setLeads(data);
-    } catch (err) {
-      console.error('Failed to fetch leads:', err);
-    }
-  };
-
-  const handleStageChange = async (leadId: string, newStage: string) => {
-    try {
-      const res = await fetch('/api/update-deal-stage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId, newStage }),
-      });
-
+      const res = await fetch('/api/rollback-lead-stages', { method: 'POST' });
       if (res.ok) {
-        setLeads((prevLeads) =>
-          prevLeads.map((lead) =>
-            lead.id === leadId ? { ...lead, current_stage: newStage } : lead
-          )
-        );
+        setMessage('Rollback completed successfully.');
       } else {
-        console.error('Failed to update deal stage');
+        setMessage('Rollback failed.');
       }
-    } catch (err) {
-      console.error('Network error during update:', err);
+    } catch (error) {
+      setMessage(`Rollback error: ${(error as Error).message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <main style={{ padding: '2rem' }}>
       <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Settings</h1>
-
-      {leads.length === 0 ? (
-        <div>Loading leads...</div>
-      ) : (
-        leads.map((lead) => (
-          <div
-            key={lead.id}
-            style={{
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              backgroundColor: '#f9fafb',
-            }}
-          >
-            <div style={{ fontWeight: 'bold' }}>{lead.company}</div>
-            <div>👤 {lead.name}</div>
-            <div>💼 {lead.job_title || 'No Title'}</div>
-            <div>✉️ {lead.email || 'No Email'}</div>
-            <div style={{ marginTop: '0.5rem' }}>
-              <div>🌍 Country: {lead.country || '—'}</div>
-              <div style={{ marginTop: '0.25rem' }}>
-                <DealStageDropdown
-                  leadId={lead.id}
-                  currentStage={lead.current_stage || 'Lead Only'}
-                  onStageChange={handleStageChange}
-                />
-              </div>
-            </div>
-          </div>
-        ))
-      )}
+      <button
+        onClick={handleRollback}
+        disabled={loading}
+        style={{
+          padding: '0.5rem 1rem',
+          backgroundColor: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0.375rem',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+      >
+        {loading ? 'Rolling back...' : 'Rollback Lead Stages'}
+      </button>
+      {message && <p style={{ marginTop: '1rem', color: '#333' }}>{message}</p>}
     </main>
   );
 }
