@@ -1,104 +1,174 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import DealStageDropdown from './components/DealStageDropdown';
-import { fetchLeadsFromAPI } from '../lib/fetchLeads';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import EngagementDropdown from '@/components/EngagementDropdown';
+import DealStageDropdown from '@/components/DealStageDropdown';
+import { fetchLeads } from '@/lib/fetchLeads';
+
+export const dynamic = 'force-dynamic';
 
 interface Lead {
   id: string;
   company: string;
   name: string;
-  job_title?: string;
-  email?: string;
-  current_stage?: string;
-  country?: string;
+  title: string;
+  email: string;
+  country: string;
+  current_stage: string;
+  source: string;
+  engagement: string;
 }
 
-export default function HomePage() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-
-  useEffect(() => {
-    refreshLeads();
-  }, []);
-
-  const refreshLeads = async () => {
-    try {
-      const data = await fetchLeadsFromAPI();
-      setLeads(data);
-    } catch (err) {
-      console.error('Failed to fetch leads:', err);
-    }
+const FilterBar = ({ dealStages, engagementLevels, sources, selectedFilters, setSelectedFilters }: any) => {
+  const toggleFilter = (type: string, value: string) => {
+    setSelectedFilters((prev: any) => {
+      const updated = { ...prev };
+      updated[type] = updated[type].includes(value)
+        ? updated[type].filter((v: string) => v !== value)
+        : [...updated[type], value];
+      return updated;
+    });
   };
 
-  const handleStageChange = async (leadId: string, newStage: string) => {
-    try {
-      const res = await fetch('/api/update-deal-stage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: leadId, newStage }),
-      });
+  const createDropdown = (label: string, options: string[], type: string) => (
+    <div>
+      <label className="text-sm font-semibold mr-2">{label}:</label>
+      <select
+        multiple
+        className="border rounded p-1 text-sm"
+        value={selectedFilters[type]}
+        onChange={(e) => {
+          const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+          setSelectedFilters((prev: any) => ({ ...prev, [type]: selected }));
+        }}
+      >
+        {options.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
 
-      if (res.ok) {
-        setLeads((prevLeads) =>
-          prevLeads.map((lead) =>
-            lead.id === leadId ? { ...lead, current_stage: newStage } : lead
-          )
-        );
-      } else {
-        console.error('Failed to update deal stage');
-      }
-    } catch (err) {
-      console.error('Network error during update:', err);
-    }
+  return (
+    <div className="flex gap-4 justify-end p-2">
+      {createDropdown('Deal Stage', dealStages, 'dealStage')}
+      {createDropdown('Source', sources, 'source')}
+      {createDropdown('Engagement', engagementLevels, 'engagement')}
+    </div>
+  );
+};
+
+const SortableLeadCard = ({ lead, onDealStageChange, onEngagementChange }: any) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: lead.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
   return (
-    <main style={{ padding: '2rem' }}>
-      {leads.length === 0 ? (
-        <div>Loading leads...</div>
-      ) : (
-        leads.map((lead) => (
-          <div
-            key={lead.id}
-            style={{
-              border: '1px solid #e5e7eb',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-              backgroundColor: '#f9fafb',
-            }}
-          >
-            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#000000' }}>
-              {lead.company}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>👤 {lead.name}</div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              💼 {lead.job_title || 'No Title'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563' }}>
-              ✉️ {lead.email || 'No Email'}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#4b5563', marginTop: '0.5rem' }}>
-              🌍 Country: {lead.country || '—'}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginTop: '0.25rem',
-              }}
-            >
-              <span style={{ fontSize: '0.85rem', color: '#4b5563' }}>📊 Deal Stage:</span>
-              <DealStageDropdown
-                leadId={lead.id}
-                currentStage={lead.current_stage || 'Lead Only'}
-                onStageChange={handleStageChange}
-              />
-            </div>
-          </div>
-        ))
-      )}
-    </main>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="border rounded p-4 mb-2 shadow-sm bg-white">
+      <div className="font-semibold text-base">{lead.company}</div>
+      <div className="text-sm text-gray-700">{lead.name} – {lead.title}</div>
+      <div className="text-sm text-gray-500">{lead.email} • {lead.country}</div>
+      <div className="flex gap-4 mt-2 items-center">
+        <DealStageDropdown
+          leadId={lead.id}
+          currentStage={lead.current_stage}
+          onStageChange={onDealStageChange}
+        />
+        <EngagementDropdown
+          leadId={lead.id}
+          currentEngagement={lead.engagement}
+          onEngagementChange={onEngagementChange}
+        />
+        <span className="text-sm px-2 py-1 bg-gray-200 rounded">{lead.source}</span>
+      </div>
+    </div>
+  );
+};
+
+export default function Page() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
+  const [selectedFilters, setSelectedFilters] = useState({
+    dealStage: [] as string[],
+    engagement: [] as string[],
+    source: [] as string[],
+  });
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchLeads();
+      setLeads(data);
+      setFilteredLeads(data);
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    let temp = [...leads];
+    ['dealStage', 'engagement', 'source'].forEach((type) => {
+      const selected = selectedFilters[type as keyof typeof selectedFilters];
+      if (selected.length > 0) {
+        temp = temp.filter((lead) => selected.includes(lead[type === 'dealStage' ? 'current_stage' : type]));
+      }
+    });
+    setFilteredLeads(temp);
+  }, [selectedFilters, leads]);
+
+  const handleDealStageChange = (leadId: string, newStage: string) => {
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === leadId ? { ...lead, current_stage: newStage } : lead))
+    );
+  };
+
+  const handleEngagementChange = (leadId: string, newEngagement: string) => {
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === leadId ? { ...lead, engagement: newEngagement } : lead))
+    );
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      setLeads((prev) => {
+        const oldIndex = prev.findIndex((l) => l.id === active.id);
+        const newIndex = prev.findIndex((l) => l.id === over.id);
+        const reordered = arrayMove(prev, oldIndex, newIndex);
+        return reordered;
+      });
+    }
+  };
+
+  const dealStages = Array.from(new Set(leads.map((l) => l.current_stage)));
+  const engagementLevels = Array.from(new Set(leads.map((l) => l.engagement)));
+  const sources = Array.from(new Set(leads.map((l) => l.source)));
+
+  return (
+    <div className="p-4 max-w-4xl mx-auto">
+      <FilterBar
+        dealStages={dealStages}
+        engagementLevels={engagementLevels}
+        sources={sources}
+        selectedFilters={selectedFilters}
+        setSelectedFilters={setSelectedFilters}
+      />
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={filteredLeads.map((l) => l.id)} strategy={verticalListSortingStrategy}>
+          {filteredLeads.map((lead) => (
+            <SortableLeadCard
+              key={lead.id}
+              lead={lead}
+              onDealStageChange={handleDealStageChange}
+              onEngagementChange={handleEngagementChange}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+    </div>
   );
 }
