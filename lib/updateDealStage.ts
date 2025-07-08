@@ -1,17 +1,11 @@
-'use server'
-
-import { supabase } from '@/lib/supabaseClient'
-
 export async function updateDealStage(leadId: string, newStage: string) {
-  const { error } = await supabase
-    .from('leads')
-    .update({ deal_stage: newStage })
-    .eq('id', leadId)
+  const response = await fetch('/api/update-deal-stage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ leadId, newStage }),
+  });
 
-  if (error) {
-    console.error('Failed to update deal stage:', error.message)
-    return { success: false, error: error.message }
+  if (!response.ok) {
+    throw new Error('Failed to update deal stage');
   }
-
-  return { success: true }
 }

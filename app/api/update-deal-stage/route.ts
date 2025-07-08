@@ -1,8 +1,8 @@
-'use client';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabaseClient';
 
-import { createClient } from './supabaseClient';
-
-export const updateDealStage = async (leadId: string, newStage: string) => {
+export async function POST(req: Request) {
+  const { leadId, newStage } = await req.json();
   const supabase = createClient();
 
   const { error } = await supabase
@@ -11,6 +11,8 @@ export const updateDealStage = async (leadId: string, newStage: string) => {
     .eq('id', leadId);
 
   if (error) {
-    console.error('Error updating deal stage:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
-};
+
+  return NextResponse.json({ success: true });
+}

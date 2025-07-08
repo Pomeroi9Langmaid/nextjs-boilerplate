@@ -1,19 +1,10 @@
-'use client';
+export async function fetchLeads() {
+  const response = await fetch('/api/get-leads', { cache: 'no-store' });
 
-import { createClient } from './supabaseClient';
-
-export const fetchLeads = async () => {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from('leads')
-    .select('*')
-    .order('company', { ascending: true });
-
-  if (error) {
-    console.error('Error fetching leads:', error);
-    return [];
+  if (!response.ok) {
+    throw new Error('Failed to fetch leads');
   }
 
-  return data;
-};
+  const data = await response.json();
+  return data.leads;
+}
