@@ -1,5 +1,4 @@
 'use client';
-
 import React from 'react';
 
 interface Props {
@@ -24,14 +23,14 @@ const dealStageOptions = [
 const getColor = (stage: string) => {
   switch (stage) {
     case 'Lead Only': return '#e5e7eb';
-    case 'Meeting Only': return '#c7d2fe';
-    case 'Demo Complete (10%)': return '#fde68a';
-    case 'Proposal Sent (25%)': return '#fdba74';
-    case 'Discussing Commercials (50%)': return '#fca5a5';
-    case 'Contract/Negotiation (90%)': return '#fcd34d';
+    case 'Meeting Only': return '#facc15';
+    case 'Demo Complete (10%)': return '#bae6fd';
+    case 'Proposal Sent (25%)': return '#a5b4fc';
+    case 'Discussing Commercials (50%)': return '#fdba74';
+    case 'Contract/Negotiation (90%)': return '#f87171';
     case 'ON HOLD': return '#d1d5db';
-    case 'WON Deal': return '#6ee7b7';
-    case 'Lost Deal': return '#f87171';
+    case 'WON Deal': return '#86efac';
+    case 'Lost Deal': return '#fca5a5';
     case 'CLOSED': return '#9ca3af';
     default: return '#e5e7eb';
   }
@@ -42,8 +41,7 @@ const DealStageDropdown: React.FC<Props> = ({ leadId, currentStage, onStageChang
     <select
       value={currentStage}
       onChange={(e) => onStageChange(leadId, e.target.value)}
-      className="text-sm rounded-md px-2 py-1 border"
-      style={{ backgroundColor: getColor(currentStage) }}
+      style={{ backgroundColor: getColor(currentStage), padding: '4px', borderRadius: '6px' }}
     >
       {dealStageOptions.map((stage) => (
         <option key={stage} value={stage}>

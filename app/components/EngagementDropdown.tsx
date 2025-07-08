@@ -1,5 +1,4 @@
 'use client';
-
 import React from 'react';
 
 interface Props {
@@ -8,25 +7,41 @@ interface Props {
   onEngagementChange: (leadId: string, newEngagement: string) => void;
 }
 
-const engagementOptions = ['Low', 'Medium', 'High', 'Very High'];
+const engagementOptions = [
+  'Low',
+  'Medium',
+  'High',
+  'Unresponsive',
+  'Not Contacted',
+  'Replied',
+  'Meeting Scheduled',
+  'No-show',
+];
 
 const getColor = (engagement: string) => {
   switch (engagement) {
-    case 'Low': return '#f87171';        // red
-    case 'Medium': return '#fbbf24';     // amber
-    case 'High': return '#34d399';       // green
-    case 'Very High': return '#3b82f6';  // blue
-    default: return '#d1d5db';           // grey
+    case 'Low': return '#fca5a5';
+    case 'Medium': return '#fdba74';
+    case 'High': return '#86efac';
+    case 'Unresponsive': return '#e5e7eb';
+    case 'Not Contacted': return '#d1d5db';
+    case 'Replied': return '#a5b4fc';
+    case 'Meeting Scheduled': return '#facc15';
+    case 'No-show': return '#f87171';
+    default: return '#e5e7eb';
   }
 };
 
-const EngagementDropdown: React.FC<Props> = ({ leadId, currentEngagement, onEngagementChange }) => {
+const EngagementDropdown: React.FC<Props> = ({
+  leadId,
+  currentEngagement,
+  onEngagementChange,
+}) => {
   return (
     <select
       value={currentEngagement}
       onChange={(e) => onEngagementChange(leadId, e.target.value)}
-      className="text-sm rounded-md px-2 py-1 border"
-      style={{ backgroundColor: getColor(currentEngagement) }}
+      style={{ backgroundColor: getColor(currentEngagement), padding: '4px', borderRadius: '6px' }}
     >
       {engagementOptions.map((level) => (
         <option key={level} value={level}>
