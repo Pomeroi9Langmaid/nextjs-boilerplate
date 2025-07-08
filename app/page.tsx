@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import { fetchLeads } from '../lib/fetchLeads';
 import { updateDealStage } from '../lib/updateDealStage';
 import { updateEngagement } from '../lib/updateEngagement';
-import LeadCard from '@/components/LeadCard';
+import LeadCard from './components/LeadCard';
 export const dynamic = 'force-dynamic';
-
 interface Lead {
   id: string;
   company: string;
