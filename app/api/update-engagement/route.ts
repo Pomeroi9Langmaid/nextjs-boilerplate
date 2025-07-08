@@ -1,29 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabaseClient';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export async function POST(req: Request) {
+  const { leadId, newEngagement } = await req.json();
+  const supabase = createClient();
 
-export async function POST(request: NextRequest) {
-  try {
-    const { id, newEngagement } = await request.json();
+  const { error } = await supabase
+    .from('leads')
+    .update({ engagement: newEngagement })
+    .eq('id', leadId);
 
-    if (!id || !newEngagement) {
-      return NextResponse.json({ error: 'Missing id or newEngagement' }, { status: 400 });
-    }
-
-    const { error } = await supabase
-      .from('leads')
-      .update({ engagement: newEngagement })
-      .eq('id', id);
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ message: 'Engagement updated successfully' });
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to update engagement' }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ success: false, error: error.message });
   }
+
+  return NextResponse.json({ success: true });
 }

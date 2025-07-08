@@ -1,28 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import LeadCard from '../components/LeadCard';
-import { fetchLeads } from '../lib/fetchLeads';
-import { updateDealStage } from '../lib/updateDealStage';
-import { updateEngagement } from '../lib/updateEngagement';
+import React, { useEffect, useState } from 'react';
+import { fetchLeads } from '@/lib/fetchLeads';
+import { updateDealStage } from '@/lib/updateDealStage';
+import { updateEngagement } from '@/lib/updateEngagement';
+import LeadCard from '@/components/LeadCard';
 
 export const dynamic = 'force-dynamic';
 
-interface Lead {
-  id: string;
-  company: string;
-  name: string;
-  title: string;
-  email: string;
-  country: string;
-  source: string;
-  current_stage: string;
-  engagement: string;
-}
-
-export default function HomePage() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
+const Page = () => {
+  const [leads, setLeads] = useState<any[]>([]);
+  const [filteredLeads, setFilteredLeads] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -35,8 +23,8 @@ export default function HomePage() {
 
   const handleDealStageChange = async (leadId: string, newStage: string) => {
     await updateDealStage(leadId, newStage);
-    setLeads((prev) =>
-      prev.map((lead) =>
+    setFilteredLeads((prevLeads) =>
+      prevLeads.map((lead) =>
         lead.id === leadId ? { ...lead, current_stage: newStage } : lead
       )
     );
@@ -44,16 +32,16 @@ export default function HomePage() {
 
   const handleEngagementChange = async (leadId: string, newEngagement: string) => {
     await updateEngagement(leadId, newEngagement);
-    setLeads((prev) =>
-      prev.map((lead) =>
+    setFilteredLeads((prevLeads) =>
+      prevLeads.map((lead) =>
         lead.id === leadId ? { ...lead, engagement: newEngagement } : lead
       )
     );
   };
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4">Lead Tracker</h1>
+    <main className="p-6 max-w-5xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Smartvel Lead Tracker</h1>
       {filteredLeads.map((lead) => (
         <LeadCard
           key={lead.id}
@@ -64,4 +52,6 @@ export default function HomePage() {
       ))}
     </main>
   );
-}
+};
+
+export default Page;
