@@ -1,122 +1,82 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { DealStageDropdown } from '@/components/DealStageDropdown';
-import { EngagementDropdown } from '@/components/EngagementDropdown';
-import fetchLeads from '@/lib/fetchLeads';
+import { useEffect, useState } from "react";
+import { fetchLeads } from "@/lib/fetchLeads";
+import DealStageDropdown from "@/components/DealStageDropdown";
+import EngagementDropdown from "@/components/EngagementDropdown";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-interface Lead {
-  id: string;
-  company: string;
-  contact_name: string;
-  job_title: string;
-  email: string;
-  current_stage: string;
-  engagement: string;
-  country?: string;
-}
-
-export default function Page() {
-  const [leads, setLeads] = useState<Lead[]>([]);
+export default function Home() {
+  const [leads, setLeads] = useState<any[]>([]);
 
   useEffect(() => {
-    const loadLeads = async () => {
+    const getLeads = async () => {
       const data = await fetchLeads();
       setLeads(data);
     };
-    loadLeads();
+    getLeads();
   }, []);
 
   const handleStageChange = async (leadId: string, newStage: string) => {
-    const updatedLeads = leads.map((lead) =>
-      lead.id === leadId ? { ...lead, current_stage: newStage } : lead
-    );
-    setLeads(updatedLeads);
-
-    await fetch('/api/update-deal-stage', {
-      method: 'POST',
+    await fetch("/api/update-deal-stage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ leadId, newStage }),
     });
+    setLeads((prev) =>
+      prev.map((lead) =>
+        lead.id === leadId ? { ...lead, current_stage: newStage } : lead
+      )
+    );
   };
 
-  const handleEngagementChange = async (leadId: string, newLevel: string) => {
-    const updatedLeads = leads.map((lead) =>
-      lead.id === leadId ? { ...lead, engagement: newLevel } : lead
-    );
-    setLeads(updatedLeads);
-
-    await fetch('/api/update-engagement', {
-      method: 'POST',
-      body: JSON.stringify({ leadId, newLevel }),
+  const handleEngagementChange = async (leadId: string, newEngagement: string) => {
+    await fetch("/api/update-engagement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ leadId, newEngagement }),
     });
+    setLeads((prev) =>
+      prev.map((lead) =>
+        lead.id === leadId ? { ...lead, engagement_level: newEngagement } : lead
+      )
+    );
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-64 bg-white border-r p-4">
-        <h2 className="text-lg font-semibold mb-4">Filters</h2>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Deal Stage:</label>
-          <select className="w-full border rounded px-2 py-1 h-10" size={6}>
-            <option>Lead Only</option>
-            <option>Meeting Only</option>
-            <option>Demo Complete (10%)</option>
-            <option>Proposal Sent (25%)</option>
-            <option>Discussing Commercials (50%)</option>
-            <option>Contract/Negotiation (90%)</option>
-            <option>ON HOLD</option>
-            <option>WON Deal</option>
-            <option>Lost Deal</option>
-            <option>CLOSED</option>
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Engagement:</label>
-          <select className="w-full border rounded px-2 py-1 h-10" size={2}>
-            <option>Hot</option>
-            <option>Warm</option>
-          </select>
-        </div>
-      </div>
+    <main style={{ padding: 20, fontFamily: "Arial, sans-serif" }}>
+      <h2 style={{ fontWeight: 600, fontSize: 18, marginBottom: 10 }}>Lead Tracker</h2>
 
-      {/* Lead Cards Area */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        <h1 className="text-xl font-bold mb-6">Lead Tracker</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {leads.map((lead) => (
-            <div
-              key={lead.id}
-              className="bg-white shadow-md p-4 rounded-xl border border-gray-200"
-            >
-              <div className="font-semibold text-lg mb-1">{lead.company}</div>
-              <div className="text-sm text-gray-700 mb-1">
-                {lead.contact_name}
-                {lead.job_title ? ` – ${lead.job_title}` : ''}
-              </div>
-              <div className="text-sm text-gray-500 mb-2">{lead.email}</div>
+      {leads.map((lead) => (
+        <div
+          key={lead.id}
+          style={{
+            border: "1px solid #ccc",
+            padding: 15,
+            marginBottom: 10,
+            borderRadius: 8,
+            background: "#f9f9f9",
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{lead.company}</div>
+          <div style={{ color: "#333" }}>{lead.name} – {lead.email} • {lead.country}</div>
 
-              <div className="mb-2">
-                <DealStageDropdown
-                  leadId={lead.id}
-                  currentStage={lead.current_stage}
-                  onStageChange={handleStageChange}
-                />
-              </div>
+          <div style={{ marginTop: 10, display: "flex", gap: 10 }}>
+            <DealStageDropdown
+              leadId={lead.id}
+              currentStage={lead.current_stage}
+              onStageChange={handleStageChange}
+            />
 
-              <div>
-                <EngagementDropdown
-                  leadId={lead.id}
-                  currentLevel={lead.engagement}
-                  onEngagementChange={handleEngagementChange}
-                />
-              </div>
-            </div>
-          ))}
+            <EngagementDropdown
+              leadId={lead.id}
+              engagementLevel={lead.engagement_level || ""}
+              onEngagementChange={handleEngagementChange}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      ))}
+    </main>
   );
 }
