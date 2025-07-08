@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import EngagementDropdown from '@/components/EngagementDropdown';
-import DealStageDropdown from '@/components/DealStageDropdown';
-import { fetchLeads } from '@/lib/fetchLeads';
+import EngagementDropdown from '../components/EngagementDropdown';
+import DealStageDropdown from '../components/DealStageDropdown';
+import { fetchLeads } from '../lib/fetchLeads';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,16 +23,6 @@ interface Lead {
 }
 
 const FilterBar = ({ dealStages, engagementLevels, sources, selectedFilters, setSelectedFilters }: any) => {
-  const toggleFilter = (type: string, value: string) => {
-    setSelectedFilters((prev: any) => {
-      const updated = { ...prev };
-      updated[type] = updated[type].includes(value)
-        ? updated[type].filter((v: string) => v !== value)
-        : [...updated[type], value];
-      return updated;
-    });
-  };
-
   const createDropdown = (label: string, options: string[], type: string) => (
     <div>
       <label className="text-sm font-semibold mr-2">{label}:</label>
