@@ -60,10 +60,20 @@ const SortableLeadCard = ({ lead, onDealStageChange, onEngagementChange }: any) 
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="border rounded p-4 mb-2 shadow-sm bg-white">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="border rounded p-4 mb-2 shadow-sm bg-white"
+    >
       <div className="font-semibold text-base">{lead.company}</div>
-      <div className="text-sm text-gray-700">{lead.name} – {lead.title}</div>
-      <div className="text-sm text-gray-500">{lead.email} • {lead.country}</div>
+      <div className="text-sm text-gray-700">
+        {lead.name} – {lead.title}
+      </div>
+      <div className="text-sm text-gray-500">
+        {lead.email} • {lead.country}
+      </div>
       <div className="flex gap-4 mt-2 items-center">
         <DealStageDropdown
           leadId={lead.id}
@@ -104,7 +114,9 @@ export default function Page() {
     ['dealStage', 'engagement', 'source'].forEach((type) => {
       const selected = selectedFilters[type as keyof typeof selectedFilters];
       if (selected.length > 0) {
-        temp = temp.filter((lead) => selected.includes(lead[type === 'dealStage' ? 'current_stage' : type]));
+        temp = temp.filter((lead) =>
+          selected.includes(lead[type === 'dealStage' ? 'current_stage' : type])
+        );
       }
     });
     setFilteredLeads(temp);
