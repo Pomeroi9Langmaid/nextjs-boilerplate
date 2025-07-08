@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import EngagementDropdown from '../components/EngagementDropdown';
-import DealStageDropdown from '../components/DealStageDropdown';
+import EngagementDropdown from './components/EngagementDropdown';
+import DealStageDropdown from './components/DealStageDropdown';
 import { fetchLeads } from '../lib/fetchLeads';
 
 export const dynamic = 'force-dynamic';
