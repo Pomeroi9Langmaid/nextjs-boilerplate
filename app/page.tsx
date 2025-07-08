@@ -1,11 +1,10 @@
-// app/page.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchLeads } from '../lib/fetchLeads';
+import { updateDealStage } from '../lib/updateDealStage';
+import { updateEngagement } from '../lib/updateEngagement';
 import LeadCard from '../components/LeadCard';
-import fetchLeads from '../lib/fetchLeads';
-import updateDealStage from '../lib/updateDealStage';
-import updateEngagement from '../lib/updateEngagement';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,15 +20,15 @@ interface Lead {
   engagement: string;
 }
 
-export default function HomePage() {
+export default function Home() {
   const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
-    const loadLeads = async () => {
+    const getLeads = async () => {
       const data = await fetchLeads();
       setLeads(data);
     };
-    loadLeads();
+    getLeads();
   }, []);
 
   const handleDealStageChange = async (leadId: string, newStage: string) => {
@@ -51,8 +50,8 @@ export default function HomePage() {
   };
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Smartvel Lead Tracker</h1>
+    <main className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Lead Tracker</h1>
       {leads.map((lead) => (
         <LeadCard
           key={lead.id}

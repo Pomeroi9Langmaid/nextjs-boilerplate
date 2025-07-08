@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabaseClient';
 
-export async function POST(req: Request) {
-  const { leadId, newEngagement } = await req.json();
+export async function POST(request: Request) {
+  const { leadId, newEngagement } = await request.json();
+
   const supabase = createClient();
 
   const { error } = await supabase
@@ -11,8 +11,12 @@ export async function POST(req: Request) {
     .eq('id', leadId);
 
   if (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
   }
 
-  return NextResponse.json({ success: true });
+  return new Response(JSON.stringify({ message: 'Engagement updated' }), {
+    status: 200,
+  });
 }
