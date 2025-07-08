@@ -1,8 +1,6 @@
-import { createClient } from './supabaseClient';
+import { supabase } from './supabaseClient';
 
 export const fetchLeads = async () => {
-  const supabase = createClient();
-
   const { data, error } = await supabase
     .from('leads')
     .select('*')
