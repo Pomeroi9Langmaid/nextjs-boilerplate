@@ -1,5 +1,17 @@
-export async function fetchLeadsFromAPI() {
-  const res = await fetch('/api/get-leads');
-  if (!res.ok) throw new Error('Failed to fetch leads from API');
-  return res.json();
-}
+import { createClient } from './supabaseClient';
+
+export const fetchLeads = async () => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('leads')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching leads:', error.message);
+    return [];
+  }
+
+  return data || [];
+};
