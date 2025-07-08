@@ -3,8 +3,8 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import DealStageDropdown from './DealStageDropdown';
-import EngagementDropdown from './EngagementDropdown';
+import DealStageDropdown from '../components/DealStageDropdown';
+import EngagementDropdown from '../components/EngagementDropdown';
 
 interface Lead {
   id: string;
